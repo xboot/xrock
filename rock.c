@@ -70,10 +70,7 @@ void rock_maskrom_init_ddr(struct xrock_ctx_t * ctx, const char * filename)
 	rc4_setkey(&rc4, key, sizeof(key));
 	f = fopen(filename, "rb");
 	if(!f)
-	{
-		perror("Failed to open ddr file");
 		exit(-1);
-	}
 	while((n = fread(buf, 1, 4096, f)) == 4096)
 	{
 		rc4_crypt(&rc4, buf, n);
@@ -103,10 +100,7 @@ void rock_maskrom_init_usbplug(struct xrock_ctx_t * ctx, const char * filename)
 	rc4_setkey(&rc4, key, sizeof(key));
 	f = fopen(filename, "rb");
 	if(!f)
-	{
-		perror("Failed to open usbplug file");
 		exit(-1);
-	}
 	while((n = fread(buf, 1, 4096, f)) == 4096)
 	{
 		rc4_crypt(&rc4, buf, n);
