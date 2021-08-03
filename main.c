@@ -83,13 +83,9 @@ static void usage(void)
 	printf("usage:\r\n");
 	printf("    xrock maskrom <ddr> <usbplug>        - Initial chip using ddr and usbplug in maskrom mode\r\n");
 	printf("    xrock reset [maskrom]                - Reset device to normal or maskrom mode\n");
-
-	printf("    xrock version                        - Show chip version\r\n");
 	printf("    xrock hexdump <address> <length>     - Dumps memory region in hex\r\n");
 	printf("    xrock dump <address> <length>        - Binary memory dump to stdout\r\n");
 	printf("    xrock exec <address>                 - Call function address\r\n");
-	printf("    xrock read32 <address>               - Read 32-bits value from device memory\r\n");
-	printf("    xrock write32 <address> <value>      - Write 32-bits value to device memory\r\n");
 	printf("    xrock read <address> <length> <file> - Read memory to file\r\n");
 	printf("    xrock write <address> <file>         - Write file to memory\r\n");
 }
@@ -127,8 +123,8 @@ int main(int argc, char * argv[])
 			else
 				usage();
 		}
-		else
-			usage();
+	//	else
+	//		usage();
 	}
 	//else
 	{
@@ -150,7 +146,7 @@ int main(int argc, char * argv[])
 				char * buf = malloc(len);
 				if(buf)
 				{
-					//fel_read(&ctx, addr, buf, len);
+					rock_read(&ctx, addr, buf, len);
 					hexdump(addr, buf, len);
 					free(buf);
 				}
@@ -169,7 +165,7 @@ int main(int argc, char * argv[])
 				char * buf = malloc(len);
 				if(buf)
 				{
-					//fel_read(&ctx, addr, buf, len);
+					rock_read(&ctx, addr, buf, len);
 					fwrite(buf, len, 1, stdout);
 					free(buf);
 				}
@@ -184,32 +180,7 @@ int main(int argc, char * argv[])
 			if(argc == 1)
 			{
 				uint32_t addr = strtoul(argv[0], NULL, 0);
-				//fel_exec(&ctx, addr);
-			}
-			else
-				usage();
-		}
-		else if(!strcmp(argv[1], "read32"))
-		{
-			argc -= 2;
-			argv += 2;
-			if(argc == 1)
-			{
-				uint32_t addr = strtoul(argv[0], NULL, 0);
-				//printf("0x%08x\r\n", fel_read32(&ctx, addr));
-			}
-			else
-				usage();
-		}
-		else if(!strcmp(argv[1], "write32"))
-		{
-			argc -= 2;
-			argv += 2;
-			if(argc == 2)
-			{
-				uint32_t addr = strtoul(argv[0], NULL, 0);
-				size_t val = strtoul(argv[1], NULL, 0);
-				//fel_write32(&ctx, addr, val);
+				rock_exec(&ctx, addr);
 			}
 			else
 				usage();
@@ -225,7 +196,7 @@ int main(int argc, char * argv[])
 				char * buf = malloc(len);
 				if(buf)
 				{
-					//fel_read_progress(&ctx, addr, buf, len);
+					rock_read_progress(&ctx, addr, buf, len);
 					file_save(argv[2], buf, len);
 					free(buf);
 				}
@@ -244,7 +215,7 @@ int main(int argc, char * argv[])
 				void * buf = file_load(argv[1], &len);
 				if(buf)
 				{
-					//fel_write_progress(&ctx, addr, buf, len);
+					rock_write_progress(&ctx, addr, buf, len);
 					free(buf);
 				}
 			}

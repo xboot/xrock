@@ -133,31 +133,31 @@ enum {
 };
 
 enum {
-	TEST_UNIT_READY			= 0x00,
-	READ_FLASH_ID			= 0x01,
-	TEST_BAD_BLOCK			= 0x03,
-	READ_SECTOR				= 0x04,
-	WRITE_SECTOR			= 0x05,
-	ERASE_NORMAL			= 0x06,
-	ERASE_FORCE				= 0x0B,
-	READ_LBA				= 0x14,
-	WRITE_LBA				= 0x15,
-	ERASE_SYSTEMDISK		= 0x16,
-	READ_SDRAM				= 0x17,
-	WRITE_SDRAM				= 0x18,
-	EXECUTE_SDRAM			= 0x19,
-	READ_FLASH_INFO			= 0x1A,
-	READ_CHIP_INFO			= 0x1B,
-	SET_RESET_FLAG			= 0x1E,
-	WRITE_EFUSE				= 0x1F,
-	READ_EFUSE				= 0x20,
-	READ_SPI_FLASH			= 0x21,
-	WRITE_SPI_FLASH			= 0x22,
-	WRITE_NEW_EFUSE			= 0x23,
-	READ_NEW_EFUSE			= 0x24,
-	ERASE_LBA				= 0x25,
-	READ_CAPABILITY			= 0xAA,
-	OPCODE_DEVICE_RESET		= 0xff,
+	OPCODE_TEST_UNIT_READY	= 0x00,
+	OPCODE_READ_FLASH_ID	= 0x01,
+	OPCODE_TEST_BAD_BLOCK	= 0x03,
+	OPCODE_READ_SECTOR		= 0x04,
+	OPCODE_WRITE_SECTOR		= 0x05,
+	OPCODE_ERASE_NORMAL		= 0x06,
+	OPCODE_ERASE_FORCE		= 0x0b,
+	OPCODE_READ_LBA			= 0x14,
+	OPCODE_WRITE_LBA		= 0x15,
+	OPCODE_ERASE_SYSTEM		= 0x16,
+	OPCODE_READ_SDRAM		= 0x17,
+	OPCODE_WRITE_SDRAM		= 0x18,
+	OPCODE_EXEC_SDRAM		= 0x19,
+	OPCODE_READ_FLASH_INFO	= 0x1a,
+	OPCODE_READ_CHIP_INFO	= 0x1b,
+	OPCODE_SET_RESET_FLAG	= 0x1e,
+	OPCODE_WRITE_EFUSE		= 0x1f,
+	OPCODE_READ_EFUSE		= 0x20,
+	OPCODE_READ_SPI_FLASH	= 0x21,
+	OPCODE_WRITE_SPI_FLASH	= 0x22,
+	OPCODE_WRITE_NEW_EFUSE	= 0x23,
+	OPCODE_READ_NEW_EFUSE	= 0x24,
+	OPCODE_ERASE_LBA		= 0x25,
+	OPCODE_READ_CAPABILITY	= 0xaa,
+	OPCODE_RESET_DEVICE		= 0xff,
 };
 
 struct usb_request_t {
@@ -166,15 +166,13 @@ struct usb_request_t {
 	uint32_t length;
 	uint8_t flag;
 	uint8_t lun;
-	uint8_t xlength;
-	struct {
-		uint8_t opcode;
-		uint8_t reserved1;
-		uint32_t address;
-		uint8_t reserved2;
-		uint16_t length;
-		uint8_t reserved3[7];
-	} x;
+	uint8_t count;
+	uint8_t opcode;
+	uint8_t reserved1;
+	uint32_t address;
+	uint8_t reserved2;
+	uint16_t size;
+	uint8_t reserved3[7];
 } __attribute__((packed));
 
 struct usb_response_t {
@@ -184,7 +182,7 @@ struct usb_response_t {
 	uint8_t status;
 } __attribute__((packed));
 
-static void usb_bulk_send(libusb_device_handle * hdl, int ep, void * buf, size_t len)
+static inline void usb_bulk_send(libusb_device_handle * hdl, int ep, void * buf, size_t len)
 {
 	size_t max_chunk = 128 * 1024;
 	size_t chunk;
@@ -201,7 +199,7 @@ static void usb_bulk_send(libusb_device_handle * hdl, int ep, void * buf, size_t
 	}
 }
 
-static void usb_bulk_recv(libusb_device_handle * hdl, int ep, void * buf, size_t len)
+static inline void usb_bulk_recv(libusb_device_handle * hdl, int ep, void * buf, size_t len)
 {
 	int r, bytes;
 
@@ -215,7 +213,7 @@ static void usb_bulk_recv(libusb_device_handle * hdl, int ep, void * buf, size_t
 	}
 }
 
-static uint32_t make_tag(void)
+static inline uint32_t make_tag(void)
 {
 	uint32_t tag = 0;
 	int i;
@@ -234,9 +232,9 @@ int rock_reset(struct xrock_ctx_t * ctx, enum reset_type_t type)
 	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
 	req.tag = cpu_to_be32(make_tag());
 	req.flag = USB_DIRECTION_OUT;
-	req.xlength = 6;
-	req.x.opcode = OPCODE_DEVICE_RESET;
-	req.x.reserved1 = type;
+	req.count = 6;
+	req.opcode = OPCODE_RESET_DEVICE;
+	req.reserved1 = type;
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
@@ -245,235 +243,99 @@ int rock_reset(struct xrock_ctx_t * ctx, enum reset_type_t type)
 	return 1;
 }
 
-
-
-#if 0
-struct usb_request_t {
-	char magic[8];
-	uint32_t length;
-	uint32_t unknown1;
-	uint16_t request;
-	uint32_t length2;
-	char pad[10];
-} __attribute__((packed));
-
-struct fel_request_t {
-	uint32_t request;
-	uint32_t address;
-	uint32_t length;
-	uint32_t pad;
-} __attribute__((packed));
-
-static inline void usb_bulk_send(libusb_device_handle * hdl, int ep, const char * buf, size_t len)
+int rock_exec(struct xrock_ctx_t * ctx, uint32_t addr)
 {
-	size_t max_chunk = 128 * 1024;
-	size_t chunk;
-	int r, bytes;
+	struct usb_request_t req;
+	struct usb_response_t res;
 
-	while(len > 0)
-	{
-		chunk = len < max_chunk ? len : max_chunk;
-		r = libusb_bulk_transfer(hdl, ep, (void *)buf, chunk, &bytes, 10000);
-		if(r != 0)
-		{
-			printf("usb bulk send error\r\n");
-			exit(-1);
-		}
-		len -= bytes;
-		buf += bytes;
-	}
+	memset(&req, 0, sizeof(struct usb_request_t));
+	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
+	req.tag = cpu_to_be32(make_tag());
+	req.flag = USB_DIRECTION_OUT;
+	req.count = 10;
+	req.opcode = OPCODE_EXEC_SDRAM;
+	req.address = cpu_to_be32(addr);
+
+	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
+	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
+	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag) || (res.status == 1))
+		return 0;
+	return 1;
 }
 
-static inline void usb_bulk_recv(libusb_device_handle * hdl, int ep, char * buf, size_t len)
+static inline int rock_read_raw(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
-	int r, bytes;
+	struct usb_request_t req;
+	struct usb_response_t res;
 
-	while(len > 0)
-	{
-		r = libusb_bulk_transfer(hdl, ep, (void *)buf, len, &bytes, 10000);
-		if(r != 0)
-		{
-			printf("usb bulk recv error\r\n");
-			exit(-1);
-		}
-		len -= bytes;
-		buf += bytes;
-	}
+	memset(&req, 0, sizeof(struct usb_request_t));
+	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
+	req.tag = cpu_to_be32(make_tag());
+	req.flag = USB_DIRECTION_IN;
+	req.count = 10;
+	req.opcode = OPCODE_READ_SDRAM;
+	req.address = cpu_to_be32(addr);
+	req.size = cpu_to_be16(len);
+
+	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
+	usb_bulk_recv(ctx->hdl, ctx->epin, buf, len);
+	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
+	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag) || (res.status == 1))
+		return 0;
+	return 1;
 }
 
-static inline void send_usb_request(struct xrock_ctx_t * ctx, int type, size_t length)
+static inline int rock_write_raw(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
-	struct usb_request_t req = {
-		.magic = "AWUC",
-		.request = cpu_to_le16(type),
-		.length = cpu_to_le32(length),
-		.unknown1 = cpu_to_le32(0x0c000000)
-	};
-	req.length2 = req.length;
-	usb_bulk_send(ctx->hdl, ctx->epout, (const char *)&req, sizeof(struct usb_request_t));
+	struct usb_request_t req;
+	struct usb_response_t res;
+
+	memset(&req, 0, sizeof(struct usb_request_t));
+	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
+	req.tag = cpu_to_be32(make_tag());
+	req.flag = USB_DIRECTION_OUT;
+	req.count = 10;
+	req.opcode = OPCODE_WRITE_SDRAM;
+	req.address = cpu_to_be32(addr);
+	req.size = cpu_to_be16(len);
+
+	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
+	usb_bulk_send(ctx->hdl, ctx->epout, buf, len);
+	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
+	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag) || (res.status == 1))
+		return 0;
+	return 1;
 }
 
-static inline void read_usb_response(struct xrock_ctx_t * ctx)
-{
-	char buf[13];
-
-	usb_bulk_recv(ctx->hdl, ctx->epin, (char *)buf, sizeof(buf));
-	assert(strcmp(buf, "AWUS") == 0);
-}
-
-static inline void usb_write(struct xrock_ctx_t * ctx, const void * buf, size_t len)
-{
-	send_usb_request(ctx, 0x12, len);
-	usb_bulk_send(ctx->hdl, ctx->epout, (const char *)buf, len);
-	read_usb_response(ctx);
-}
-
-static inline void usb_read(struct xrock_ctx_t * ctx, const void * data, size_t len)
-{
-	send_usb_request(ctx, 0x11, len);
-	usb_bulk_send(ctx->hdl, ctx->epin, (const char *)data, len);
-	read_usb_response(ctx);
-}
-
-static inline void send_fel_request(struct xrock_ctx_t * ctx, int type, uint32_t addr, uint32_t length)
-{
-	struct fel_request_t req = {
-		.request = cpu_to_le32(type),
-		.address = cpu_to_le32(addr),
-		.length = cpu_to_le32(length)
-	};
-	usb_write(ctx, &req, sizeof(struct fel_request_t));
-}
-
-static inline void read_fel_status(struct xrock_ctx_t * ctx)
-{
-	char buf[8];
-	usb_read(ctx, buf, sizeof(buf));
-}
-
-static inline void fel_version(struct xrock_ctx_t * ctx)
-{
-	int i;
-
-	send_fel_request(ctx, 0x001, 0, 0);
-	usb_read(ctx, &ctx->version, sizeof(ctx->version));
-	read_fel_status(ctx);
-	ctx->version.id = le32_to_cpu(ctx->version.id);
-	ctx->version.firmware = le32_to_cpu(ctx->version.firmware);
-	ctx->version.protocol = le16_to_cpu(ctx->version.protocol);
-	ctx->version.scratchpad = le32_to_cpu(ctx->version.scratchpad);
-	ctx->chip = NULL;
-	for(i = 0; i < ARRAY_SIZE(chips); i++)
-	{
-/*		if(chips[i]->id == ctx->version.id)
-		{
-			ctx->chip = chips[i];
-			break;
-		}*/
-	}
-}
-
-int fel_init(struct xrock_ctx_t * ctx)
-{
-	if(ctx && ctx->hdl)
-	{
-		struct libusb_config_descriptor * config;
-		int if_idx, set_idx, ep_idx;
-		const struct libusb_interface * iface;
-		const struct libusb_interface_descriptor * setting;
-		const struct libusb_endpoint_descriptor * ep;
-		if(libusb_claim_interface(ctx->hdl, 0) == 0)
-		{
-			if(libusb_get_active_config_descriptor(libusb_get_device(ctx->hdl), &config) == 0)
-			{
-				for(if_idx = 0; if_idx < config->bNumInterfaces; if_idx++)
-				{
-					iface = config->interface + if_idx;
-					for(set_idx = 0; set_idx < iface->num_altsetting; set_idx++)
-					{
-						setting = iface->altsetting + set_idx;
-						for(ep_idx = 0; ep_idx < setting->bNumEndpoints; ep_idx++)
-						{
-							ep = setting->endpoint + ep_idx;
-							if((ep->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) != LIBUSB_TRANSFER_TYPE_BULK)
-								continue;
-							if((ep->bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN)
-								ctx->epin = ep->bEndpointAddress;
-							else
-								ctx->epout = ep->bEndpointAddress;
-						}
-					}
-				}
-				libusb_free_config_descriptor(config);
-				fel_version(ctx);
-				return 1;
-			}
-		}
-	}
-	return 0;
-}
-
-void fel_exec(struct xrock_ctx_t * ctx, uint32_t addr)
-{
-	send_fel_request(ctx, 0x102, addr, 0);
-	read_fel_status(ctx);
-}
-
-static inline void fel_read_raw(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
-{
-	send_fel_request(ctx, 0x103, addr, len);
-	usb_read(ctx, buf, len);
-	read_fel_status(ctx);
-}
-
-static inline void fel_write_raw(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
-{
-	send_fel_request(ctx, 0x101, addr, len);
-	usb_write(ctx, buf, len);
-	read_fel_status(ctx);
-}
-
-uint32_t fel_read32(struct xrock_ctx_t * ctx, uint32_t addr)
-{
-	uint32_t val;
-	fel_read_raw(ctx, addr, &val, sizeof(uint32_t));
-	return val;
-}
-
-void fel_write32(struct xrock_ctx_t * ctx, uint32_t addr, uint32_t val)
-{
-	fel_write_raw(ctx, addr, &val, sizeof(uint32_t));
-}
-
-void fel_read(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+void rock_read(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
 	size_t n;
 
 	while(len > 0)
 	{
-		n = len > 65536 ? 65536 : len;
-		fel_read_raw(ctx, addr, buf, n);
+		n = len > 16384 ? 16384 : len;
+		rock_read_raw(ctx, addr, buf, n);
 		addr += n;
 		buf += n;
 		len -= n;
 	}
 }
 
-void fel_write(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+void rock_write(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
 	size_t n;
 
 	while(len > 0)
 	{
-		n = len > 65536 ? 65536 : len;
-		fel_write_raw(ctx, addr, buf, n);
+		n = len > 16384 ? 16384 : len;
+		rock_write_raw(ctx, addr, buf, n);
 		addr += n;
 		buf += n;
 		len -= n;
 	}
 }
 
-void fel_read_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+void rock_read_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
 	struct progress_t p;
 	size_t n;
@@ -481,8 +343,8 @@ void fel_read_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size
 	progress_start(&p, len);
 	while(len > 0)
 	{
-		n = len > 65536 ? 65536 : len;
-		fel_read_raw(ctx, addr, buf, n);
+		n = len > 16384 ? 16384 : len;
+		rock_read_raw(ctx, addr, buf, n);
 		addr += n;
 		buf += n;
 		len -= n;
@@ -491,7 +353,7 @@ void fel_read_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size
 	progress_stop(&p);
 }
 
-void fel_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+void rock_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
 	struct progress_t p;
 	size_t n;
@@ -499,8 +361,8 @@ void fel_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, siz
 	progress_start(&p, len);
 	while(len > 0)
 	{
-		n = len > 65536 ? 65536 : len;
-		fel_write_raw(ctx, addr, buf, n);
+		n = len > 16384 ? 16384 : len;
+		rock_write_raw(ctx, addr, buf, n);
 		addr += n;
 		buf += n;
 		len -= n;
@@ -508,5 +370,3 @@ void fel_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, siz
 	}
 	progress_stop(&p);
 }
-#endif
-

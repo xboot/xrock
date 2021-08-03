@@ -32,11 +32,14 @@ enum reset_type_t {
 };
 
 int xrock_init(struct xrock_ctx_t * ctx);
-
 void rock_maskrom_init_ddr(struct xrock_ctx_t * ctx, const char * filename);
 void rock_maskrom_init_usbplug(struct xrock_ctx_t * ctx, const char * filename);
-
 int rock_reset(struct xrock_ctx_t * ctx, enum reset_type_t type);
+int rock_exec(struct xrock_ctx_t * ctx, uint32_t addr);
+void rock_read(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+void rock_write(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+void rock_read_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+void rock_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 
 #ifdef __cplusplus
 }
