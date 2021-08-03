@@ -120,8 +120,6 @@ void rock_maskrom_init_usbplug(struct xrock_ctx_t * ctx, const char * filename)
 	}
 }
 
-#define USB_BUCK_TIMEOUT	(10000)
-
 enum {
 	USB_REQUEST_SIGN		= 0x55534243,	/* "USBC" */
 	USB_RESPONSE_SIGN		= 0x55534253,	/* "USBS" */
@@ -191,7 +189,7 @@ static inline void usb_bulk_send(libusb_device_handle * hdl, int ep, void * buf,
 	while(len > 0)
 	{
 		chunk = len < max_chunk ? len : max_chunk;
-		r = libusb_bulk_transfer(hdl, ep, (void *)buf, chunk, &bytes, USB_BUCK_TIMEOUT);
+		r = libusb_bulk_transfer(hdl, ep, (void *)buf, chunk, &bytes, 10000);
 		if(r != 0)
 			exit(-1);
 		len -= bytes;
@@ -205,7 +203,7 @@ static inline void usb_bulk_recv(libusb_device_handle * hdl, int ep, void * buf,
 
 	while(len > 0)
 	{
-		r = libusb_bulk_transfer(hdl, ep, (void *)buf, len, &bytes, USB_BUCK_TIMEOUT);
+		r = libusb_bulk_transfer(hdl, ep, (void *)buf, len, &bytes, 10000);
 		if(r != 0)
 			exit(-1);
 		len -= bytes;
