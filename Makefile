@@ -26,7 +26,7 @@ LIBDIRS		:=
 LIBS 		:= `pkg-config --libs libusb-1.0`
 
 INCDIRS		:= -I . `pkg-config --cflags libusb-1.0`
-SRCDIRS		:= . chips
+SRCDIRS		:= .
 
 
 SFILES		:= $(foreach dir, $(SRCDIRS), $(wildcard $(dir)/*.S))

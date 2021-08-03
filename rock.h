@@ -18,26 +18,25 @@ struct chip_t {
 struct xrock_ctx_t {
 	libusb_device_handle * hdl;
 	struct chip_t * chip;
-	int maskrom;
-
-
 	int epout;
 	int epin;
-	struct {
-		char magic[8];
-		uint32_t id;
-		uint32_t firmware;
-		uint16_t protocol;
-		uint8_t  dflag;
-		uint8_t  dlength;
-		uint32_t scratchpad;
-		uint8_t pad[8];
-	} version;
+	int maskrom;
+};
+
+enum reset_type_t {
+	RESET_TYPE_NONE			= 0x00,
+	RESET_TYPE_MSC			= 0x01,
+	RESET_TYPE_POWEROFF		= 0x02,
+	RESET_TYPE_MASKROM		= 0x03,
+	RESET_TYPE_DISCONNECT	= 0x04,
 };
 
 int xrock_init(struct xrock_ctx_t * ctx);
+
 void rock_maskrom_init_ddr(struct xrock_ctx_t * ctx, const char * filename);
 void rock_maskrom_init_usbplug(struct xrock_ctx_t * ctx, const char * filename);
+
+int rock_reset(struct xrock_ctx_t * ctx, enum reset_type_t type);
 
 #ifdef __cplusplus
 }
