@@ -184,7 +184,7 @@ struct usb_response_t {
 	uint8_t status;
 } __attribute__((packed));
 
-static inline void usb_bulk_send(libusb_device_handle * hdl, int ep, void * buf, size_t len)
+static void usb_bulk_send(libusb_device_handle * hdl, int ep, void * buf, size_t len)
 {
 	size_t max_chunk = 128 * 1024;
 	size_t chunk;
@@ -201,7 +201,7 @@ static inline void usb_bulk_send(libusb_device_handle * hdl, int ep, void * buf,
 	}
 }
 
-static inline void usb_bulk_recv(libusb_device_handle * hdl, int ep, void * buf, size_t len)
+static void usb_bulk_recv(libusb_device_handle * hdl, int ep, void * buf, size_t len)
 {
 	int r, bytes;
 
@@ -215,7 +215,7 @@ static inline void usb_bulk_recv(libusb_device_handle * hdl, int ep, void * buf,
 	}
 }
 
-static inline uint32_t make_tag(void)
+static uint32_t make_tag(void)
 {
 	uint32_t tag = 0;
 	int i;
@@ -232,7 +232,7 @@ int rock_reset(struct xrock_ctx_t * ctx, enum reset_type_t type)
 
 	memset(&req, 0, sizeof(struct usb_request_t));
 	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
-	req.tag = make_tag();
+	req.tag = cpu_to_be32(make_tag());
 	req.flag = USB_DIRECTION_OUT;
 	req.xlength = 6;
 	req.x.opcode = OPCODE_DEVICE_RESET;
@@ -240,15 +240,7 @@ int rock_reset(struct xrock_ctx_t * ctx, enum reset_type_t type)
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
-	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
-	{
-		printf("error 0x%08x\r\n", be32_to_cpu(res.signature));
-	}
-	else
-	{
-		printf("ok %d\r\n", res.status);
-	}
-	if(res.status == 1)
+	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag) || (res.status == 1))
 		return 0;
 	return 1;
 }

@@ -81,18 +81,17 @@ static void usage(void)
 {
 	printf("xrock(v1.0.0) - https://github.com/xboot/xrock\r\n");
 	printf("usage:\r\n");
-	printf("    xrock maskrom <ddr> <usbplug>                - Initial chip using ddr and usbplug in maskrom mode\r\n");
+	printf("    xrock maskrom <ddr> <usbplug>        - Initial chip using ddr and usbplug in maskrom mode\r\n");
+	printf("    xrock reset [maskrom]                - Reset device to normal or maskrom mode\n");
 
-	printf("    xrock reset                                  - Reset device\r\n");
-
-	printf("    xrock version                                - Show chip version\r\n");
-	printf("    xrock hexdump <address> <length>             - Dumps memory region in hex\r\n");
-	printf("    xrock dump <address> <length>                - Binary memory dump to stdout\r\n");
-	printf("    xrock exec <address>                         - Call function address\r\n");
-	printf("    xrock read32 <address>                       - Read 32-bits value from device memory\r\n");
-	printf("    xrock write32 <address> <value>              - Write 32-bits value to device memory\r\n");
-	printf("    xrock read <address> <length> <file>         - Read memory to file\r\n");
-	printf("    xrock write <address> <file>                 - Write file to memory\r\n");
+	printf("    xrock version                        - Show chip version\r\n");
+	printf("    xrock hexdump <address> <length>     - Dumps memory region in hex\r\n");
+	printf("    xrock dump <address> <length>        - Binary memory dump to stdout\r\n");
+	printf("    xrock exec <address>                 - Call function address\r\n");
+	printf("    xrock read32 <address>               - Read 32-bits value from device memory\r\n");
+	printf("    xrock write32 <address> <value>      - Write 32-bits value to device memory\r\n");
+	printf("    xrock read <address> <length> <file> - Read memory to file\r\n");
+	printf("    xrock write <address> <file>         - Write file to memory\r\n");
 }
 
 int main(int argc, char * argv[])
@@ -135,8 +134,10 @@ int main(int argc, char * argv[])
 	{
 		if(!strcmp(argv[1], "reset"))
 		{
-			printf("rest....\r\n");
-			rock_reset(&ctx, RESET_TYPE_NONE);
+			if((argc > 2) && !strcmp(argv[2], "maskrom"))
+				rock_reset(&ctx, RESET_TYPE_MASKROM);
+			else
+				rock_reset(&ctx, RESET_TYPE_NORMAL);
 		}
 		else if(!strcmp(argv[1], "hexdump"))
 		{

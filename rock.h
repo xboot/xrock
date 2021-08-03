@@ -24,7 +24,7 @@ struct xrock_ctx_t {
 };
 
 enum reset_type_t {
-	RESET_TYPE_NONE			= 0x00,
+	RESET_TYPE_NORMAL		= 0x00,
 	RESET_TYPE_MSC			= 0x01,
 	RESET_TYPE_POWEROFF		= 0x02,
 	RESET_TYPE_MASKROM		= 0x03,
