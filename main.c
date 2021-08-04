@@ -108,124 +108,120 @@ int main(int argc, char * argv[])
 		libusb_exit(NULL);
 		return -1;
 	}
-
-	if(ctx.maskrom)
+	if(!strcmp(argv[1], "maskrom"))
 	{
-		if(!strcmp(argv[1], "maskrom"))
+		argc -= 2;
+		argv += 2;
+		if(argc == 2)
 		{
-			argc -= 2;
-			argv += 2;
-			if(argc == 2)
-			{
-				rock_maskrom_init_ddr(&ctx, argv[0]);
-				rock_maskrom_init_usbplug(&ctx, argv[1]);
-			}
-			else
-				usage();
+			rock_maskrom_init_ddr(&ctx, argv[0]);
+			rock_maskrom_init_usbplug(&ctx, argv[1]);
 		}
-	//	else
-	//		usage();
+		else
+			usage();
 	}
-	//else
+	else if(!strcmp(argv[1], "reset"))
 	{
-		if(!strcmp(argv[1], "reset"))
+		if(argc > 2)
 		{
-			if((argc > 2) && !strcmp(argv[2], "maskrom"))
-				rock_reset(&ctx, RESET_TYPE_MASKROM);
-			else
-				rock_reset(&ctx, RESET_TYPE_NORMAL);
-		}
-		else if(!strcmp(argv[1], "hexdump"))
-		{
-			argc -= 2;
-			argv += 2;
-			if(argc == 2)
-			{
-				uint32_t addr = strtoul(argv[0], NULL, 0);
-				size_t len = strtoul(argv[1], NULL, 0);
-				char * buf = malloc(len);
-				if(buf)
-				{
-					rock_read(&ctx, addr, buf, len);
-					hexdump(addr, buf, len);
-					free(buf);
-				}
-			}
-			else
-				usage();
-		}
-		else if(!strcmp(argv[1], "dump"))
-		{
-			argc -= 2;
-			argv += 2;
-			if(argc == 2)
-			{
-				uint32_t addr = strtoul(argv[0], NULL, 0);
-				size_t len = strtoul(argv[1], NULL, 0);
-				char * buf = malloc(len);
-				if(buf)
-				{
-					rock_read(&ctx, addr, buf, len);
-					fwrite(buf, len, 1, stdout);
-					free(buf);
-				}
-			}
-			else
-				usage();
-		}
-		else if(!strcmp(argv[1], "exec"))
-		{
-			argc -= 2;
-			argv += 2;
-			if(argc == 1)
-			{
-				uint32_t addr = strtoul(argv[0], NULL, 0);
-				rock_exec(&ctx, addr);
-			}
-			else
-				usage();
-		}
-		else if(!strcmp(argv[1], "read"))
-		{
-			argc -= 2;
-			argv += 2;
-			if(argc == 3)
-			{
-				uint32_t addr = strtoul(argv[0], NULL, 0);
-				size_t len = strtoul(argv[1], NULL, 0);
-				char * buf = malloc(len);
-				if(buf)
-				{
-					rock_read_progress(&ctx, addr, buf, len);
-					file_save(argv[2], buf, len);
-					free(buf);
-				}
-			}
-			else
-				usage();
-		}
-		else if(!strcmp(argv[1], "write"))
-		{
-			argc -= 2;
-			argv += 2;
-			if(argc == 2)
-			{
-				uint32_t addr = strtoul(argv[0], NULL, 0);
-				size_t len;
-				void * buf = file_load(argv[1], &len);
-				if(buf)
-				{
-					rock_write_progress(&ctx, addr, buf, len);
-					free(buf);
-				}
-			}
+			if(!strcmp(argv[2], "maskrom"))
+				rock_reset(&ctx, 1);
 			else
 				usage();
 		}
 		else
+			rock_reset(&ctx, 0);
+	}
+	else if(!strcmp(argv[1], "hexdump"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 2)
 		{
-			usage();
+			uint32_t addr = strtoul(argv[0], NULL, 0);
+			size_t len = strtoul(argv[1], NULL, 0);
+			char * buf = malloc(len);
+			if(buf)
+			{
+				rock_read(&ctx, addr, buf, len);
+				hexdump(addr, buf, len);
+				free(buf);
+			}
 		}
+		else
+			usage();
+	}
+	else if(!strcmp(argv[1], "dump"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 2)
+		{
+			uint32_t addr = strtoul(argv[0], NULL, 0);
+			size_t len = strtoul(argv[1], NULL, 0);
+			char * buf = malloc(len);
+			if(buf)
+			{
+				rock_read(&ctx, addr, buf, len);
+				fwrite(buf, len, 1, stdout);
+				free(buf);
+			}
+		}
+		else
+			usage();
+	}
+	else if(!strcmp(argv[1], "exec"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 1)
+		{
+			uint32_t addr = strtoul(argv[0], NULL, 0);
+			rock_exec(&ctx, addr);
+		}
+		else
+			usage();
+	}
+	else if(!strcmp(argv[1], "read"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 3)
+		{
+			uint32_t addr = strtoul(argv[0], NULL, 0);
+			size_t len = strtoul(argv[1], NULL, 0);
+			char * buf = malloc(len);
+			if(buf)
+			{
+				rock_read_progress(&ctx, addr, buf, len);
+				file_save(argv[2], buf, len);
+				free(buf);
+			}
+		}
+		else
+			usage();
+	}
+	else if(!strcmp(argv[1], "write"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 2)
+		{
+			uint32_t addr = strtoul(argv[0], NULL, 0);
+			size_t len;
+			void * buf = file_load(argv[1], &len);
+			if(buf)
+			{
+				rock_write_progress(&ctx, addr, buf, len);
+				free(buf);
+			}
+		}
+		else
+			usage();
+	}
+	else
+	{
+		usage();
 	}
 	if(ctx.hdl)
 		libusb_close(ctx.hdl);

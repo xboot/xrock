@@ -23,18 +23,10 @@ struct xrock_ctx_t {
 	int maskrom;
 };
 
-enum reset_type_t {
-	RESET_TYPE_NORMAL		= 0x00,
-	RESET_TYPE_MSC			= 0x01,
-	RESET_TYPE_POWEROFF		= 0x02,
-	RESET_TYPE_MASKROM		= 0x03,
-	RESET_TYPE_DISCONNECT	= 0x04,
-};
-
 int xrock_init(struct xrock_ctx_t * ctx);
 void rock_maskrom_init_ddr(struct xrock_ctx_t * ctx, const char * filename);
 void rock_maskrom_init_usbplug(struct xrock_ctx_t * ctx, const char * filename);
-int rock_reset(struct xrock_ctx_t * ctx, enum reset_type_t type);
+int rock_reset(struct xrock_ctx_t * ctx, int maskrom);
 int rock_exec(struct xrock_ctx_t * ctx, uint32_t addr);
 void rock_read(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 void rock_write(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);

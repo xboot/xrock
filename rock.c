@@ -48,6 +48,7 @@ int xrock_init(struct xrock_ctx_t * ctx)
 		    	{
 		    		ctx->epout = 2 | LIBUSB_ENDPOINT_OUT;
 		    		ctx->epin = 1 | LIBUSB_ENDPOINT_IN;
+		    		printf("desc.bcdUSB = 0x%08x\r\n", desc.bcdUSB);
 		    		if((desc.bcdUSB & 0x0001) == 0x0000)
 		    			ctx->maskrom = 1;
 		    		else
@@ -221,7 +222,7 @@ static inline uint32_t make_tag(void)
 	return tag;
 }
 
-int rock_reset(struct xrock_ctx_t * ctx, enum reset_type_t type)
+int rock_reset(struct xrock_ctx_t * ctx, int maskrom)
 {
 	struct usb_request_t req;
 	struct usb_response_t res;
@@ -232,7 +233,7 @@ int rock_reset(struct xrock_ctx_t * ctx, enum reset_type_t type)
 	req.flag = USB_DIRECTION_OUT;
 	req.count = 6;
 	req.opcode = OPCODE_RESET_DEVICE;
-	req.reserved1 = type;
+	req.reserved1 = maskrom ? 0x03 : 0x00;
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
