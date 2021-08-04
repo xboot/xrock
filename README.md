@@ -78,8 +78,6 @@ usage:
 ```shell
 sudo xrock maskrom rk3128_ddr_300MHz_v2.12.bin rk3128_usbplug_v2.63.bin
 sudo xrock version
-sudo xrock hexdump 0x0 0x1000
-sudo xrock reset maskrom
 ```
 
 ### RK3288
@@ -87,8 +85,6 @@ sudo xrock reset maskrom
 ```shell
 sudo xrock maskrom rk3288_ddr_400MHz_v1.09.bin rk3288_usbplug_v2.58.bin
 sudo xrock version
-sudo xrock hexdump 0x0 0x1000
-sudo xrock reset maskrom
 ```
 
 ### RK3399
@@ -96,8 +92,6 @@ sudo xrock reset maskrom
 ```shell
 sudo xrock maskrom rk3399_ddr_800MHz_v1.25.bin rk3399_usbplug_v1.26.bin
 sudo xrock version
-sudo xrock hexdump 0x0 0x1000
-sudo xrock reset maskrom
 ```
 
 ### PX30
@@ -105,8 +99,6 @@ sudo xrock reset maskrom
 ```shell
 sudo xrock maskrom px30_ddr_333MHz_v1.16.bin px30_usbplug_v1.31.bin
 sudo xrock version
-sudo xrock hexdump 0x0 0x1000
-sudo xrock reset maskrom
 ```
 
 ## Links
