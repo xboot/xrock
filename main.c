@@ -95,6 +95,7 @@ static void usage(void)
 	printf("usage:\r\n");
 	printf("    xrock maskrom <ddr> <usbplug>        - Initial chip using ddr and usbplug in maskrom mode\r\n");
 	printf("    xrock version                        - Show chip version\r\n");
+	printf("    xrock capability                     - Show capability information\r\n");
 	printf("    xrock reset [maskrom]                - Reset device to normal or maskrom mode\n");
 	printf("    xrock hexdump <address> <length>     - Dumps memory region in hex\r\n");
 	printf("    xrock dump <address> <length>        - Binary memory dump to stdout\r\n");
@@ -151,6 +152,25 @@ int main(int argc, char * argv[])
 				buf[15], buf[14], buf[13], buf[12]);
 		else
 			printf("Failed to get chip version\r\n");
+	}
+	else if(!strcmp(argv[1], "capability"))
+	{
+		uint8_t buf[8];
+		if(rock_capability(&ctx, buf))
+		{
+			printf("Capability: %02x %02x %02x %02x %02x %02x %02x %02x\r\n",
+				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]);
+			printf("    Direct LBA: %s\r\n", (buf[0] & (1 << 0)) ? "enabled" : "disabled");
+			printf("    Vendor Storage: %s\r\n", (buf[0] & (1 << 1)) ? "enabled" : "disabled");
+			printf("    First 4M Access: %s\r\n", (buf[0] & (1 << 2)) ? "enabled" : "disabled");
+			printf("    Read LBA: %s\r\n", (buf[0] & (1 << 3)) ? "enabled" : "disabled");
+			printf("    Read Com Log: %s\r\n", (buf[0] & (1 << 5)) ? "enabled" : "disabled");
+			printf("    Read IDB Config: %s\r\n", (buf[0] & (1 << 6)) ? "enabled" : "disabled");
+			printf("    Read Secure Mode: %s\r\n", (buf[0] & (1 << 7)) ? "enabled" : "disabled");
+			printf("    New IDB: %s\r\n", (buf[1] & (1 << 0)) ? "enabled" : "disabled");
+		}
+		else
+			printf("Failed to show capability information\r\n");
 	}
 	else if(!strcmp(argv[1], "reset"))
 	{
@@ -277,7 +297,7 @@ int main(int argc, char * argv[])
 								info.id[0], info.id[1],	info.id[2],	info.id[3],	info.id[4]);
 			}
 			else
-				printf("Can not detect any flash\r\n");
+				printf("Failed to show flash information\r\n");
 		}
 		else
 		{

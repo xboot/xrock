@@ -276,6 +276,26 @@ int rock_version(struct xrock_ctx_t * ctx, uint8_t * buf)
 	return 1;
 }
 
+int rock_capability(struct xrock_ctx_t * ctx, uint8_t * buf)
+{
+	struct usb_request_t req;
+	struct usb_response_t res;
+
+	memset(&req, 0, sizeof(struct usb_request_t));
+	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
+	req.tag = cpu_to_be32(make_tag());
+	req.dsize = 8;
+	req.flag = USB_DIRECTION_IN;
+	req.length = 6;
+	req.opcode = OPCODE_READ_CAPABILITY;
+	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
+	usb_bulk_recv(ctx->hdl, ctx->epin, buf, 8);
+	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
+	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+		return 0;
+	return 1;
+}
+
 int rock_reset(struct xrock_ctx_t * ctx, int maskrom)
 {
 	struct usb_request_t req;
