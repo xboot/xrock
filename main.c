@@ -321,6 +321,25 @@ int main(int argc, char * argv[])
 			}
 			else if(!strcmp(argv[0], "write") && (argc == 3))
 			{
+				argc -= 1;
+				argv += 1;
+				uint32_t sec = strtoul(argv[0], NULL, 0);
+				uint32_t cnt;
+				uint64_t len;
+				void * buf = file_load(argv[1], &len);
+				if(buf)
+				{
+					if(len % 512 != 0)
+					{
+						cnt = (len >> 9) + 1;
+						buf = realloc(buf, cnt << 9);
+					}
+					else
+						cnt = (len >> 9);
+					if(!rock_flash_write_lba_progress(&ctx, sec, cnt, buf))
+						printf("Failed to write flash\\r\n");
+					free(buf);
+				}
 			}
 			else
 				usage();

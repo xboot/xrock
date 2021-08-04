@@ -47,7 +47,9 @@ int rock_read_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size
 int rock_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 int rock_flash_detect(struct xrock_ctx_t * ctx, struct flash_info_t * info);
 int rock_flash_read_lba(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, void * buf);
+int rock_flash_write_lba(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, void * buf);
 int rock_flash_read_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, void * buf);
+int rock_flash_write_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, void * buf);
 
 #ifdef __cplusplus
 }
