@@ -115,8 +115,13 @@ int main(int argc, char * argv[])
 		argv += 2;
 		if(argc == 2)
 		{
-			rock_maskrom_init_ddr(&ctx, argv[0]);
-			rock_maskrom_init_usbplug(&ctx, argv[1]);
+			if(ctx.maskrom)
+			{
+				rock_maskrom_init_ddr(&ctx, argv[0]);
+				rock_maskrom_init_usbplug(&ctx, argv[1]);
+			}
+			else
+				printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
 		}
 		else
 			usage();
@@ -125,7 +130,7 @@ int main(int argc, char * argv[])
 	{
 		uint8_t buf[16];
 		if(rock_version(&ctx, buf))
-			printf("Chip version: 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x\r\n",
+			printf("%s: 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x\r\n", ctx.chip->name,
 				buf[ 3], buf[ 2], buf[ 1], buf[ 0],
 				buf[ 7], buf[ 6], buf[ 5], buf[ 4],
 				buf[11], buf[10], buf[ 9], buf[ 8],

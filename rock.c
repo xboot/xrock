@@ -48,7 +48,6 @@ int xrock_init(struct xrock_ctx_t * ctx)
 		    	{
 		    		ctx->epout = 2 | LIBUSB_ENDPOINT_OUT;
 		    		ctx->epin = 1 | LIBUSB_ENDPOINT_IN;
-		    		printf("desc.bcdUSB = 0x%08x\r\n", desc.bcdUSB);
 		    		if((desc.bcdUSB & 0x0001) == 0x0000)
 		    			ctx->maskrom = 1;
 		    		else
