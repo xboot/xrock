@@ -380,35 +380,39 @@ static inline int rock_write_raw(struct xrock_ctx_t * ctx, uint32_t addr, void *
 	return 1;
 }
 
-void rock_read(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+int rock_read(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
 	size_t n;
 
 	while(len > 0)
 	{
 		n = len > 16384 ? 16384 : len;
-		rock_read_raw(ctx, addr, buf, n);
+		if(!rock_read_raw(ctx, addr, buf, n))
+			return 0;
 		addr += n;
 		buf += n;
 		len -= n;
 	}
+	return 1;
 }
 
-void rock_write(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+int rock_write(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
 	size_t n;
 
 	while(len > 0)
 	{
 		n = len > 16384 ? 16384 : len;
-		rock_write_raw(ctx, addr, buf, n);
+		if(!rock_write_raw(ctx, addr, buf, n))
+			return 0;
 		addr += n;
 		buf += n;
 		len -= n;
 	}
+	return 1;
 }
 
-void rock_read_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+int rock_read_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
 	struct progress_t p;
 	size_t n;
@@ -417,16 +421,18 @@ void rock_read_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, siz
 	while(len > 0)
 	{
 		n = len > 16384 ? 16384 : len;
-		rock_read_raw(ctx, addr, buf, n);
+		if(!rock_read_raw(ctx, addr, buf, n))
+			return 0;
 		addr += n;
 		buf += n;
 		len -= n;
 		progress_update(&p, n);
 	}
 	progress_stop(&p);
+	return 1;
 }
 
-void rock_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
+int rock_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len)
 {
 	struct progress_t p;
 	size_t n;
@@ -435,13 +441,15 @@ void rock_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, si
 	while(len > 0)
 	{
 		n = len > 16384 ? 16384 : len;
-		rock_write_raw(ctx, addr, buf, n);
+		if(!rock_write_raw(ctx, addr, buf, n))
+			return 0;
 		addr += n;
 		buf += n;
 		len -= n;
 		progress_update(&p, n);
 	}
 	progress_stop(&p);
+	return 1;
 }
 
 int rock_flash_detect(struct xrock_ctx_t * ctx, struct flash_info_t * info)
