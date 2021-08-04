@@ -93,16 +93,18 @@ static void usage(void)
 {
 	printf("xrock(v1.0.0) - https://github.com/xboot/xrock\r\n");
 	printf("usage:\r\n");
-	printf("    xrock maskrom <ddr> <usbplug>        - Initial chip using ddr and usbplug in maskrom mode\r\n");
-	printf("    xrock version                        - Show chip version\r\n");
-	printf("    xrock capability                     - Show capability information\r\n");
-	printf("    xrock reset [maskrom]                - Reset device to normal or maskrom mode\n");
-	printf("    xrock hexdump <address> <length>     - Dumps memory region in hex\r\n");
-	printf("    xrock dump <address> <length>        - Binary memory dump to stdout\r\n");
-	printf("    xrock read <address> <length> <file> - Read memory to file\r\n");
-	printf("    xrock write <address> <file>         - Write file to memory\r\n");
-	printf("    xrock exec <address>                 - Call function address\r\n");
-	printf("    xrock flash                          - Detect flash and show information\r\n");
+	printf("    xrock maskrom <ddr> <usbplug>            - Initial chip using ddr and usbplug in maskrom mode\r\n");
+	printf("    xrock version                            - Show chip version\r\n");
+	printf("    xrock capability                         - Show capability information\r\n");
+	printf("    xrock reset [maskrom]                    - Reset device to normal or maskrom mode\n");
+	printf("    xrock hexdump <address> <length>         - Dumps memory region in hex\r\n");
+	printf("    xrock dump <address> <length>            - Binary memory dump to stdout\r\n");
+	printf("    xrock read <address> <length> <file>     - Read memory to file\r\n");
+	printf("    xrock write <address> <file>             - Write file to memory\r\n");
+	printf("    xrock exec <address>                     - Call function address\r\n");
+	printf("    xrock flash                              - Detect flash and show information\r\n");
+	printf("    xrock flash read <sector> <count> <file> - Read flash sector to file\r\n");
+	printf("    xrock flash write <sector> <file>        - Write file to flash sector\r\n");
 }
 
 int main(int argc, char * argv[])
@@ -301,7 +303,27 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
-			usage();
+			if(!strcmp(argv[0], "read") && (argc == 4))
+			{
+				argc -= 1;
+				argv += 1;
+				uint32_t sec = strtoul(argv[0], NULL, 0);
+				uint32_t cnt = strtoul(argv[1], NULL, 0);
+				char * buf = malloc(cnt << 9);
+				if(buf)
+				{
+					if(rock_flash_read_lba_progress(&ctx, sec, cnt, buf))
+						file_save(argv[2], buf, cnt << 9);
+					else
+						printf("Failed to read flash\r\n");
+					free(buf);
+				}
+			}
+			else if(!strcmp(argv[0], "write") && (argc == 3))
+			{
+			}
+			else
+				usage();
 		}
 	}
 	else

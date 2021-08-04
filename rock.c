@@ -475,3 +475,63 @@ int rock_flash_detect(struct xrock_ctx_t * ctx, struct flash_info_t * info)
 		return 0;
 	return 1;
 }
+
+static inline int rock_flash_read_lba_raw(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, void * buf)
+{
+	struct usb_request_t req;
+	struct usb_response_t res;
+
+	memset(&req, 0, sizeof(struct usb_request_t));
+	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
+	req.tag = cpu_to_be32(make_tag());
+	req.dsize = cnt << 9;
+	req.flag = USB_DIRECTION_IN;
+	req.length = 10;
+	req.opcode = OPCODE_READ_LBA;
+	req.subcode = 0;
+	req.address = cpu_to_be32(sec);
+	req.size = cpu_to_be16((uint16_t)cnt);
+
+	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
+	usb_bulk_recv(ctx->hdl, ctx->epin, buf, cnt << 9);
+	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
+	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+		return 0;
+	return 1;
+}
+
+int rock_flash_read_lba(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, void * buf)
+{
+	uint32_t n;
+
+	while(cnt > 0)
+	{
+		n = cnt > 128 ? 128 : cnt;
+		if(!rock_flash_read_lba_raw(ctx, sec, n, buf))
+			return 0;
+		sec += n;
+		buf += (n << 9);
+		cnt -= n;
+	}
+	return 1;
+}
+
+int rock_flash_read_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, void * buf)
+{
+	struct progress_t p;
+	uint32_t n;
+
+	progress_start(&p, cnt);
+	while(cnt > 0)
+	{
+		n = cnt > 128 ? 128 : cnt;
+		if(!rock_flash_read_lba_raw(ctx, sec, n, buf))
+			return 0;
+		sec += n;
+		buf += (n << 9);
+		cnt -= n;
+		progress_update(&p, n);
+	}
+	progress_stop(&p);
+	return 1;
+}
