@@ -89,7 +89,6 @@ static void usage(void)
 	printf("    xrock read <address> <length> <file> - Read memory to file\r\n");
 	printf("    xrock write <address> <file>         - Write file to memory\r\n");
 	printf("    xrock exec <address>                 - Call function address\r\n");
-
 }
 
 int main(int argc, char * argv[])
