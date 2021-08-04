@@ -73,6 +73,13 @@ usage:
 
 - The memory base address from `0`, **NOT**  sdram's physical address.
 
+### RK1808
+
+```shell
+sudo xrock maskrom rk1808_ddr_933MHz_v1.05.bin rk1808_usbplug_v1.05.bin
+sudo xrock version
+```
+
 ### RK3128
 
 ```shell
@@ -91,6 +98,13 @@ sudo xrock version
 
 ```shell
 sudo xrock maskrom rk3399_ddr_800MHz_v1.25.bin rk3399_usbplug_v1.26.bin
+sudo xrock version
+```
+
+### RK3399PRO
+
+```shell
+sudo xrock maskrom rk3399pro_ddr_666MHz_v1.25.bin rk3399pro_usbplug_v1.26.bin
 sudo xrock version
 ```
 
