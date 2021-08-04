@@ -224,7 +224,7 @@ static inline uint32_t make_tag(void)
 	int i;
 
 	for(i = 0; i < 4; i++)
-		tag = (tag << 8) | (random() & 0xff);
+		tag = (tag << 8) | (rand() & 0xff);
 	return tag;
 }
 
