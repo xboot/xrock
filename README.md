@@ -100,6 +100,15 @@ sudo xrock hexdump 0x0 0x1000
 sudo xrock reset maskrom
 ```
 
+### PX30
+
+```shell
+sudo xrock maskrom px30_ddr_333MHz_v1.16.bin px30_usbplug_v1.31.bin
+sudo xrock version
+sudo xrock hexdump 0x0 0x1000
+sudo xrock reset maskrom
+```
+
 ## Links
 
 * [The rockchip loader binaries](https://github.com/rockchip-linux/rkbin)

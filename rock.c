@@ -16,6 +16,7 @@ static struct chip_t chips[] = {
 	{ 0x320c, "RK3328" },
 	{ 0x330a, "RK3368" },
 	{ 0x330c, "RK3399" },
+	{ 0x330d, "PX30" },
 };
 
 int xrock_init(struct xrock_ctx_t * ctx)
@@ -51,8 +52,6 @@ int xrock_init(struct xrock_ctx_t * ctx)
 		    {
 		    	if(libusb_get_device_descriptor(libusb_get_device(ctx->hdl), &desc) == 0)
 		    	{
-		    		ctx->epout = 2 | LIBUSB_ENDPOINT_OUT;
-		    		ctx->epin = 1 | LIBUSB_ENDPOINT_IN;
 					if((desc.bcdUSB & 0x0001) == 0x0000)
 						ctx->maskrom = 1;
 					else
