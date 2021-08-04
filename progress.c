@@ -1,13 +1,13 @@
 #include <progress.h>
 
-static inline double gettime(void)
+static double gettime(void)
 {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	return tv.tv_sec + (double)tv.tv_usec / 1000000.0;
 }
 
-static inline const char * format_eta(double remaining)
+static const char * format_eta(double remaining)
 {
 	static char result[6] = "";
 	int seconds = remaining + 0.5;
