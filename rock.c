@@ -192,7 +192,10 @@ static inline void usb_bulk_send(libusb_device_handle * hdl, int ep, void * buf,
 		chunk = len < max_chunk ? len : max_chunk;
 		r = libusb_bulk_transfer(hdl, ep, (void *)buf, chunk, &bytes, 10000);
 		if(r != 0)
+		{
+			printf("usb bulk send error\r\n");
 			exit(-1);
+		}
 		len -= bytes;
 		buf += bytes;
 	}
@@ -206,7 +209,10 @@ static inline void usb_bulk_recv(libusb_device_handle * hdl, int ep, void * buf,
 	{
 		r = libusb_bulk_transfer(hdl, ep, (void *)buf, len, &bytes, 10000);
 		if(r != 0)
+		{
+			printf("usb bulk recv error\r\n");
 			exit(-1);
+		}
 		len -= bytes;
 		buf += bytes;
 	}
