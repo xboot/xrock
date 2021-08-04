@@ -69,9 +69,9 @@ usage:
 
 ## Tips
 
-The maskrom command can only used in maskrom mode, Before executing other commands, you must first execute the maskrom command
+- The maskrom command can only used in maskrom mode, Before executing other commands, you must first execute the maskrom command
 
-The memory base address from `0`, **NOT**  sdram's physical address.
+- The memory base address from `0`, **NOT**  sdram's physical address.
 
 ### RK3128
 
