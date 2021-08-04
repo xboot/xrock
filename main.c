@@ -77,6 +77,18 @@ static void hexdump(uint32_t addr, void * buf, size_t len)
 	}
 }
 
+static const char * manufacturer[] = {
+	"Samsung",
+	"Toshiba",
+	"Hynix",
+	"Infineon",
+	"Micron",
+	"Renesas",
+	"ST",
+	"Intel",
+	"SanDisk",
+};
+
 static void usage(void)
 {
 	printf("xrock(v1.0.0) - https://github.com/xboot/xrock\r\n");
@@ -89,6 +101,7 @@ static void usage(void)
 	printf("    xrock read <address> <length> <file> - Read memory to file\r\n");
 	printf("    xrock write <address> <file>         - Write file to memory\r\n");
 	printf("    xrock exec <address>                 - Call function address\r\n");
+	printf("    xrock flash                          - Detect flash and show information\r\n");
 }
 
 int main(int argc, char * argv[])
@@ -237,6 +250,39 @@ int main(int argc, char * argv[])
 		}
 		else
 			usage();
+	}
+	else if(!strcmp(argv[1], "flash"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 0)
+		{
+			struct flash_info_t info;
+			if(rock_flash_detect(&ctx, &info))
+			{
+				printf("Flash Info:\r\n");
+				printf("    Manufacturer: %s (%d)\r\n", (info.manufacturer_id < ARRAY_SIZE(manufacturer))
+								? manufacturer[info.manufacturer_id] : "Unknown", info.manufacturer_id);
+				printf("    Flash Size: %dMB\r\n", info.flash_size >> 11);
+				printf("    Block Size: %dKB\r\n", info.block_size >> 1);
+				printf("    Page Size: %dKB\r\n", info.page_size >> 1);
+				printf("    ECC Bits: %d\r\n", info.ecc_bits);
+				printf("    Access Time: %d\r\n", info.access_time);
+				printf("    Flash CS: %s%s%s%s\r\n",
+								info.chip_select & 1 ? "<0>" : "",
+								info.chip_select & 2 ? "<1>" : "",
+								info.chip_select & 4 ? "<2>" : "",
+								info.chip_select & 8 ? "<3>" : "");
+				printf("    Flash ID: %02x %02x %02x %02x %02x\r\n",
+								info.id[0], info.id[1],	info.id[2],	info.id[3],	info.id[4]);
+			}
+			else
+				printf("Can not detect any flash\r\n");
+		}
+		else
+		{
+			usage();
+		}
 	}
 	else
 		usage();

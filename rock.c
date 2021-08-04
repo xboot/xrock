@@ -423,3 +423,35 @@ void rock_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, si
 	}
 	progress_stop(&p);
 }
+
+int rock_flash_detect(struct xrock_ctx_t * ctx, struct flash_info_t * info)
+{
+	struct usb_request_t req;
+	struct usb_response_t res;
+
+	memset(&req, 0, sizeof(struct usb_request_t));
+	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
+	req.tag = cpu_to_be32(make_tag());
+	req.dsize = 11;
+	req.flag = USB_DIRECTION_IN;
+	req.length = 6;
+	req.opcode = OPCODE_READ_FLASH_INFO;
+	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
+	usb_bulk_recv(ctx->hdl, ctx->epin, info, 11);
+	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
+	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+		return 0;
+	memset(&req, 0, sizeof(struct usb_request_t));
+	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
+	req.tag = cpu_to_be32(make_tag());
+	req.dsize = 5;
+	req.flag = USB_DIRECTION_IN;
+	req.length = 6;
+	req.opcode = OPCODE_READ_FLASH_ID;
+	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
+	usb_bulk_recv(ctx->hdl, ctx->epin, &info->id[0], 5);
+	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
+	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+		return 0;
+	return 1;
+}

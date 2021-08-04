@@ -23,6 +23,17 @@ struct xrock_ctx_t {
 	int maskrom;
 };
 
+struct flash_info_t {
+	uint32_t flash_size;
+	uint16_t block_size;
+	uint8_t page_size;
+	uint8_t ecc_bits;
+	uint8_t access_time;
+	uint8_t manufacturer_id;
+	uint8_t chip_select;
+	uint8_t id[5];
+};
+
 int xrock_init(struct xrock_ctx_t * ctx);
 void rock_maskrom_init_ddr(struct xrock_ctx_t * ctx, const char * filename);
 void rock_maskrom_init_usbplug(struct xrock_ctx_t * ctx, const char * filename);
@@ -33,6 +44,7 @@ void rock_read(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 void rock_write(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 void rock_read_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 void rock_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+int rock_flash_detect(struct xrock_ctx_t * ctx, struct flash_info_t * info);
 
 #ifdef __cplusplus
 }
