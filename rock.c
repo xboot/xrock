@@ -18,6 +18,7 @@ static struct chip_t chips[] = {
 	{ 0x330a, "RK3368" },
 	{ 0x330c, "RK3399" },
 	{ 0x330d, "PX30" },
+	{ 0x350a, "RK3568" },
 };
 
 int xrock_init(struct xrock_ctx_t * ctx)
