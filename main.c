@@ -130,7 +130,8 @@ int main(int argc, char * argv[])
 	{
 		uint8_t buf[16];
 		if(rock_version(&ctx, buf))
-			printf("%s: 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x\r\n", ctx.chip->name,
+			printf("%s(%c%c%c%c): 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x\r\n", ctx.chip->name,
+				buf[ 3], buf[ 2], buf[ 1], buf[ 0],
 				buf[ 3], buf[ 2], buf[ 1], buf[ 0],
 				buf[ 7], buf[ 6], buf[ 5], buf[ 4],
 				buf[11], buf[10], buf[ 9], buf[ 8],
