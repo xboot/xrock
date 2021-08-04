@@ -103,7 +103,7 @@ int main(int argc, char * argv[])
 	libusb_init(NULL);
 	if(!xrock_init(&ctx))
 	{
-		printf("ERROR: Can't found any rockchip chips\r\n");
+		printf("ERROR: Can't found any supported rockchip chips\r\n");
 		if(ctx.hdl)
 			libusb_close(ctx.hdl);
 		libusb_exit(NULL);
@@ -233,9 +233,7 @@ int main(int argc, char * argv[])
 			usage();
 	}
 	else
-	{
 		usage();
-	}
 	if(ctx.hdl)
 		libusb_close(ctx.hdl);
 	libusb_exit(NULL);
