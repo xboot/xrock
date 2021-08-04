@@ -1,11 +1,14 @@
 
 ***
 # XROCK
-The rockusb tools for rockchip SOC, support maskrom and loader mode for all chips.
+The low level tools for rockchip SOC with maskrom and loader mode support.
 
 ## How to build
 
+### Linux platform
+
 The xrock tools depends on the `libusb-1.0` library, you need to install `libusb-1.0-0-dev` before compile, for example in ubuntu:
+
 ```shell
 sudo apt install libusb-1.0-0-dev
 ```
@@ -17,6 +20,37 @@ cd xrock
 make
 sudo make install
 ```
+
+### Window platform
+
+Install some build tools
+
+```shell
+sudo apt install mingw-w64
+sudo apt install autoconf
+sudo apt install libtool-bin
+```
+
+Download and install libusb
+
+```shell
+git clone https://github.com/libusb/libusb.git
+cd libusb
+./autogen.sh
+./configure --host=i686-w64-mingw32 --prefix=/usr/i686-w64-mingw32/
+make
+sudo make install
+```
+
+Build xrock source code
+
+```shell
+cd xrock
+CROSS=i686-w64-mingw32- make
+```
+
+For 64-bits windows, you can using `x86_64-w64-mingw32-` instead of `i686-w64-mingw32` above.
+
 
 ## Usage
 
@@ -35,14 +69,17 @@ usage:
 
 ## Tips
 
+The maskrom command can only used in maskrom mode, Before executing other commands, you must first execute the maskrom command
+
 The memory base address from `0`, **NOT**  sdram's physical address.
 
 ### RK3128
 
 ```shell
-sudo xrock reset maskrom
 sudo xrock maskrom rk3128_ddr_300MHz_v2.12.bin rk3128_usbplug_v2.63.bin
+sudo xrock version
 sudo xrock hexdump 0x0 0x1000
+sudo xrock reset maskrom
 ```
 
 ## Links
