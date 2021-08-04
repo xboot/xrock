@@ -103,6 +103,7 @@ static void usage(void)
 	printf("    xrock write <address> <file>             - Write file to memory\r\n");
 	printf("    xrock exec <address>                     - Call function address\r\n");
 	printf("    xrock flash                              - Detect flash and show information\r\n");
+	printf("    xrock flash erase <sector> <count>       - Erase flash sector\r\n");
 	printf("    xrock flash read <sector> <count> <file> - Read flash sector to file\r\n");
 	printf("    xrock flash write <sector> <file>        - Write file to flash sector\r\n");
 }
@@ -303,7 +304,16 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
-			if(!strcmp(argv[0], "read") && (argc == 4))
+			if(!strcmp(argv[0], "erase") && (argc == 3))
+			{
+				argc -= 1;
+				argv += 1;
+				uint32_t sec = strtoul(argv[0], NULL, 0);
+				uint32_t cnt = strtoul(argv[1], NULL, 0);
+				if(!rock_flash_erase_lba_progress(&ctx, sec, cnt))
+					printf("Failed to erase flash\r\n");
+			}
+			else if(!strcmp(argv[0], "read") && (argc == 4))
 			{
 				argc -= 1;
 				argv += 1;
