@@ -91,6 +91,15 @@ sudo xrock hexdump 0x0 0x1000
 sudo xrock reset maskrom
 ```
 
+### RK3399
+
+```shell
+sudo xrock maskrom rk3399_ddr_800MHz_v1.25.bin rk3399_usbplug_v1.26.bin
+sudo xrock version
+sudo xrock hexdump 0x0 0x1000
+sudo xrock reset maskrom
+```
+
 ## Links
 
 * [The rockchip loader binaries](https://github.com/rockchip-linux/rkbin)
