@@ -82,12 +82,14 @@ static void usage(void)
 	printf("xrock(v1.0.0) - https://github.com/xboot/xrock\r\n");
 	printf("usage:\r\n");
 	printf("    xrock maskrom <ddr> <usbplug>        - Initial chip using ddr and usbplug in maskrom mode\r\n");
+	printf("    xrock version                        - Show chip version\r\n");
 	printf("    xrock reset [maskrom]                - Reset device to normal or maskrom mode\n");
 	printf("    xrock hexdump <address> <length>     - Dumps memory region in hex\r\n");
 	printf("    xrock dump <address> <length>        - Binary memory dump to stdout\r\n");
-	printf("    xrock exec <address>                 - Call function address\r\n");
 	printf("    xrock read <address> <length> <file> - Read memory to file\r\n");
 	printf("    xrock write <address> <file>         - Write file to memory\r\n");
+	printf("    xrock exec <address>                 - Call function address\r\n");
+
 }
 
 int main(int argc, char * argv[])
@@ -119,6 +121,18 @@ int main(int argc, char * argv[])
 		}
 		else
 			usage();
+	}
+	else if(!strcmp(argv[1], "version"))
+	{
+		uint8_t buf[16];
+		if(rock_version(&ctx, buf))
+			printf("Chip version: 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x\r\n",
+				buf[ 3], buf[ 2], buf[ 1], buf[ 0],
+				buf[ 7], buf[ 6], buf[ 5], buf[ 4],
+				buf[11], buf[10], buf[ 9], buf[ 8],
+				buf[15], buf[14], buf[13], buf[12]);
+		else
+			printf("Failed to get chip version\r\n");
 	}
 	else if(!strcmp(argv[1], "reset"))
 	{
@@ -170,18 +184,6 @@ int main(int argc, char * argv[])
 		else
 			usage();
 	}
-	else if(!strcmp(argv[1], "exec"))
-	{
-		argc -= 2;
-		argv += 2;
-		if(argc == 1)
-		{
-			uint32_t addr = strtoul(argv[0], NULL, 0);
-			rock_exec(&ctx, addr);
-		}
-		else
-			usage();
-	}
 	else if(!strcmp(argv[1], "read"))
 	{
 		argc -= 2;
@@ -215,6 +217,18 @@ int main(int argc, char * argv[])
 				rock_write_progress(&ctx, addr, buf, len);
 				free(buf);
 			}
+		}
+		else
+			usage();
+	}
+	else if(!strcmp(argv[1], "exec"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 1)
+		{
+			uint32_t addr = strtoul(argv[0], NULL, 0);
+			rock_exec(&ctx, addr);
 		}
 		else
 			usage();

@@ -26,6 +26,7 @@ struct xrock_ctx_t {
 int xrock_init(struct xrock_ctx_t * ctx);
 void rock_maskrom_init_ddr(struct xrock_ctx_t * ctx, const char * filename);
 void rock_maskrom_init_usbplug(struct xrock_ctx_t * ctx, const char * filename);
+int rock_version(struct xrock_ctx_t * ctx, uint8_t * buf);
 int rock_reset(struct xrock_ctx_t * ctx, int maskrom);
 int rock_exec(struct xrock_ctx_t * ctx, uint32_t addr);
 void rock_read(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
