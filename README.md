@@ -60,7 +60,7 @@ usage:
     xrock maskrom <ddr> <usbplug>            - Initial chip using ddr and usbplug in maskrom mode
     xrock version                            - Show chip version
     xrock capability                         - Show capability information
-    xrock reset [maskrom]                    - Reset device to normal or maskrom mode
+    xrock reset [maskrom]                    - Reset chip to normal or maskrom mode
     xrock hexdump <address> <length>         - Dumps memory region in hex
     xrock dump <address> <length>            - Binary memory dump to stdout
     xrock read <address> <length> <file>     - Read memory to file
@@ -76,7 +76,7 @@ usage:
 
 - The maskrom command can only used in maskrom mode, Before executing other commands, you must first execute the maskrom command
 
-- The memory base address from `0`, **NOT**  sdram's physical address.
+- The memory base address from 0, **NOT** sdram's physical address.
 
 ### RK1808
 

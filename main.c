@@ -96,7 +96,7 @@ static void usage(void)
 	printf("    xrock maskrom <ddr> <usbplug>            - Initial chip using ddr and usbplug in maskrom mode\r\n");
 	printf("    xrock version                            - Show chip version\r\n");
 	printf("    xrock capability                         - Show capability information\r\n");
-	printf("    xrock reset [maskrom]                    - Reset device to normal or maskrom mode\n");
+	printf("    xrock reset [maskrom]                    - Reset chip to normal or maskrom mode\n");
 	printf("    xrock hexdump <address> <length>         - Dumps memory region in hex\r\n");
 	printf("    xrock dump <address> <length>            - Binary memory dump to stdout\r\n");
 	printf("    xrock read <address> <length> <file>     - Read memory to file\r\n");
