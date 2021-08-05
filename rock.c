@@ -328,6 +328,7 @@ int rock_exec(struct xrock_ctx_t * ctx, uint32_t addr)
 	req.flag = USB_DIRECTION_OUT;
 	req.length = 10;
 	req.opcode = OPCODE_EXEC_SDRAM;
+	req.subcode = 0xaa;
 	req.address = cpu_to_be32(addr);
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
