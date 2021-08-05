@@ -120,6 +120,13 @@ sudo xrock maskrom px30_ddr_333MHz_v1.16.bin px30_usbplug_v1.31.bin
 sudo xrock version
 ```
 
+### RK3308
+
+```shell
+sudo xrock maskrom rk3308_ddr_589MHz_uart2_m1_v1.31.bin rk3308_usbplug_v1.27.bin
+sudo xrock version
+```
+
 ## Links
 
 * [The rockchip loader binaries](https://github.com/rockchip-linux/rkbin)

@@ -21,6 +21,7 @@ ATTRS{idVendor}=="2207", ATTRS{idProduct}=="320c", MODE="0666", GROUP="users"
 ATTRS{idVendor}=="2207", ATTRS{idProduct}=="330a", MODE="0666", GROUP="users"
 ATTRS{idVendor}=="2207", ATTRS{idProduct}=="330c", MODE="0666", GROUP="users"
 ATTRS{idVendor}=="2207", ATTRS{idProduct}=="330d", MODE="0666", GROUP="users"
+ATTRS{idVendor}=="2207", ATTRS{idProduct}=="330e", MODE="0666", GROUP="users"
 ATTRS{idVendor}=="2207", ATTRS{idProduct}=="350a", MODE="0666", GROUP="users"
 
 LABEL="end_rules"
