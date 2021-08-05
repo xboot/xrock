@@ -62,7 +62,7 @@ void progress_update(struct progress_t * p, size_t bytes)
 		if(p->done < p->total)
 			printf("] %s/s, ETA %s", ssize(buf1, speed), format_eta(eta));
 		else
-			printf("] %s, %s/s   ", ssize(buf1, p->done), ssize(buf2, speed));
+			printf("] %s, %s/s        ", ssize(buf1, p->done), ssize(buf2, speed));
 		fflush(stdout);
 	}
 }
