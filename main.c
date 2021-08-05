@@ -287,6 +287,7 @@ int main(int argc, char * argv[])
 				printf("    Manufacturer: %s (%d)\r\n", (info.manufacturer_id < ARRAY_SIZE(manufacturer))
 								? manufacturer[info.manufacturer_id] : "Unknown", info.manufacturer_id);
 				printf("    Flash Size: %dMB\r\n", info.flash_size >> 11);
+				printf("    Sectors: %d\r\n", info.flash_size);
 				printf("    Block Size: %dKB\r\n", info.block_size >> 1);
 				printf("    Page Size: %dKB\r\n", info.page_size >> 1);
 				printf("    ECC Bits: %d\r\n", info.ecc_bits);
