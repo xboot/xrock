@@ -25,7 +25,7 @@ struct xrock_ctx_t {
 };
 
 struct flash_info_t {
-	uint32_t flash_size;
+	uint32_t sector_total;
 	uint16_t block_size;
 	uint8_t page_size;
 	uint8_t ecc_bits;

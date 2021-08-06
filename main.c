@@ -164,12 +164,12 @@ int main(int argc, char * argv[])
 			printf("Capability: %02x %02x %02x %02x %02x %02x %02x %02x\r\n",
 				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]);
 			printf("    Direct LBA: %s\r\n", (buf[0] & (1 << 0)) ? "enabled" : "disabled");
-			printf("    Vendor Storage: %s\r\n", (buf[0] & (1 << 1)) ? "enabled" : "disabled");
-			printf("    First 4M Access: %s\r\n", (buf[0] & (1 << 2)) ? "enabled" : "disabled");
+			printf("    Vendor storage: %s\r\n", (buf[0] & (1 << 1)) ? "enabled" : "disabled");
+			printf("    First 4M access: %s\r\n", (buf[0] & (1 << 2)) ? "enabled" : "disabled");
 			printf("    Read LBA: %s\r\n", (buf[0] & (1 << 3)) ? "enabled" : "disabled");
-			printf("    Read Com Log: %s\r\n", (buf[0] & (1 << 5)) ? "enabled" : "disabled");
-			printf("    Read IDB Config: %s\r\n", (buf[0] & (1 << 6)) ? "enabled" : "disabled");
-			printf("    Read Secure Mode: %s\r\n", (buf[0] & (1 << 7)) ? "enabled" : "disabled");
+			printf("    Read com log: %s\r\n", (buf[0] & (1 << 5)) ? "enabled" : "disabled");
+			printf("    Read IDB config: %s\r\n", (buf[0] & (1 << 6)) ? "enabled" : "disabled");
+			printf("    Read secure mode: %s\r\n", (buf[0] & (1 << 7)) ? "enabled" : "disabled");
 			printf("    New IDB: %s\r\n", (buf[1] & (1 << 0)) ? "enabled" : "disabled");
 		}
 		else
@@ -283,15 +283,16 @@ int main(int argc, char * argv[])
 			struct flash_info_t info;
 			if(rock_flash_detect(&ctx, &info))
 			{
-				printf("Flash Info:\r\n");
+				printf("Flash info:\r\n");
 				printf("    Manufacturer: %s (%d)\r\n", (info.manufacturer_id < ARRAY_SIZE(manufacturer))
 								? manufacturer[info.manufacturer_id] : "Unknown", info.manufacturer_id);
-				printf("    Flash Size: %dMB\r\n", info.flash_size >> 11);
-				printf("    Sectors: %d\r\n", info.flash_size);
-				printf("    Block Size: %dKB\r\n", info.block_size >> 1);
-				printf("    Page Size: %dKB\r\n", info.page_size >> 1);
-				printf("    ECC Bits: %d\r\n", info.ecc_bits);
-				printf("    Access Time: %d\r\n", info.access_time);
+				printf("    Capacity: %dMB\r\n", info.sector_total >> 11);
+				printf("    Sector size: %d\r\n", 512);
+				printf("    Sector count: %d\r\n", info.sector_total);
+				printf("    Block size: %dKB\r\n", info.block_size >> 1);
+				printf("    Page size: %dKB\r\n", info.page_size >> 1);
+				printf("    ECC bits: %d\r\n", info.ecc_bits);
+				printf("    Access time: %d\r\n", info.access_time);
 				printf("    Flash CS: %s%s%s%s\r\n",
 								info.chip_select & 1 ? "<0>" : "",
 								info.chip_select & 2 ? "<1>" : "",
@@ -309,48 +310,94 @@ int main(int argc, char * argv[])
 			{
 				argc -= 1;
 				argv += 1;
+				struct flash_info_t info;
 				uint32_t sec = strtoul(argv[0], NULL, 0);
 				uint32_t cnt = strtoul(argv[1], NULL, 0);
-				if(!rock_flash_erase_lba_progress(&ctx, sec, cnt))
-					printf("Failed to erase flash\r\n");
+				if(rock_flash_detect(&ctx, &info))
+				{
+					if(sec < info.sector_total)
+					{
+						if(cnt <= 0)
+							cnt = info.sector_total - sec;
+						else if(cnt > info.sector_total - sec)
+							cnt = info.sector_total - sec;
+						if(!rock_flash_erase_lba_progress(&ctx, sec, cnt))
+							printf("Failed to erase flash\r\n");
+					}
+					else
+						printf("The start sector is out of range\r\n");
+				}
+				else
+					printf("Failed to detect flash\r\n");
 			}
 			else if(!strcmp(argv[0], "read") && (argc == 4))
 			{
 				argc -= 1;
 				argv += 1;
+				struct flash_info_t info;
 				uint32_t sec = strtoul(argv[0], NULL, 0);
 				uint32_t cnt = strtoul(argv[1], NULL, 0);
-				char * buf = malloc(cnt << 9);
-				if(buf)
+				if(rock_flash_detect(&ctx, &info))
 				{
-					if(rock_flash_read_lba_progress(&ctx, sec, cnt, buf))
-						file_save(argv[2], buf, cnt << 9);
+					if(sec < info.sector_total)
+					{
+						if(cnt <= 0)
+							cnt = info.sector_total - sec;
+						else if(cnt > info.sector_total - sec)
+							cnt = info.sector_total - sec;
+						char * buf = malloc((uint64_t)cnt << 9);
+						if(buf)
+						{
+							if(rock_flash_read_lba_progress(&ctx, sec, cnt, buf))
+								file_save(argv[2], buf, (uint64_t)cnt << 9);
+							else
+								printf("Failed to read flash\r\n");
+							free(buf);
+						}
+					}
 					else
-						printf("Failed to read flash\r\n");
-					free(buf);
+						printf("The start sector is out of range\r\n");
 				}
+				else
+					printf("Failed to detect flash\r\n");
 			}
 			else if(!strcmp(argv[0], "write") && (argc == 3))
 			{
 				argc -= 1;
 				argv += 1;
+				struct flash_info_t info;
 				uint32_t sec = strtoul(argv[0], NULL, 0);
 				uint32_t cnt;
+				void * buf;
 				uint64_t len;
-				void * buf = file_load(argv[1], &len);
-				if(buf)
+				if(rock_flash_detect(&ctx, &info))
 				{
-					if(len % 512 != 0)
+					if(sec < info.sector_total)
 					{
-						cnt = (len >> 9) + 1;
-						buf = realloc(buf, cnt << 9);
+						buf = file_load(argv[1], &len);
+						if(buf)
+						{
+							if(len % 512 != 0)
+							{
+								cnt = (len >> 9) + 1;
+								buf = realloc(buf, (uint64_t)cnt << 9);
+							}
+							else
+								cnt = (len >> 9);
+							if(cnt <= 0)
+								cnt = info.sector_total - sec;
+							else if(cnt > info.sector_total - sec)
+								cnt = info.sector_total - sec;
+							if(!rock_flash_write_lba_progress(&ctx, sec, cnt, buf))
+								printf("Failed to write flash\\r\n");
+							free(buf);
+						}
 					}
 					else
-						cnt = (len >> 9);
-					if(!rock_flash_write_lba_progress(&ctx, sec, cnt, buf))
-						printf("Failed to write flash\\r\n");
-					free(buf);
+						printf("The start sector is out of range\r\n");
 				}
+				else
+					printf("Failed to detect flash\r\n");
 			}
 			else
 				usage();
