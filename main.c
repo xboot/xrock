@@ -302,7 +302,7 @@ int main(int argc, char * argv[])
 								info.id[0], info.id[1],	info.id[2],	info.id[3],	info.id[4]);
 			}
 			else
-				printf("Failed to show flash information\r\n");
+				printf("Failed to detect flash\r\n");
 		}
 		else
 		{
