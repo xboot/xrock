@@ -607,7 +607,7 @@ int rock_flash_erase_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32
 	struct progress_t p;
 	uint32_t n;
 
-	progress_start(&p, cnt << 9);
+	progress_start(&p, (uint64_t)cnt << 9);
 	while(cnt > 0)
 	{
 		n = cnt > 32768 ? 32768 : cnt;
@@ -615,7 +615,7 @@ int rock_flash_erase_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32
 			return 0;
 		sec += n;
 		cnt -= n;
-		progress_update(&p, n << 9);
+		progress_update(&p, (uint64_t)n << 9);
 	}
 	progress_stop(&p);
 	return 1;
@@ -626,7 +626,7 @@ int rock_flash_read_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_
 	struct progress_t p;
 	uint32_t n;
 
-	progress_start(&p, cnt << 9);
+	progress_start(&p, (uint64_t)cnt << 9);
 	while(cnt > 0)
 	{
 		n = cnt > 128 ? 128 : cnt;
@@ -635,7 +635,7 @@ int rock_flash_read_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_
 		sec += n;
 		buf += (n << 9);
 		cnt -= n;
-		progress_update(&p, n << 9);
+		progress_update(&p, (uint64_t)n << 9);
 	}
 	progress_stop(&p);
 	return 1;
@@ -646,7 +646,7 @@ int rock_flash_write_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32
 	struct progress_t p;
 	uint32_t n;
 
-	progress_start(&p, cnt << 9);
+	progress_start(&p, (uint64_t)cnt << 9);
 	while(cnt > 0)
 	{
 		n = cnt > 128 ? 128 : cnt;
@@ -655,7 +655,7 @@ int rock_flash_write_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32
 		sec += n;
 		buf += (n << 9);
 		cnt -= n;
-		progress_update(&p, n << 9);
+		progress_update(&p, (uint64_t)n << 9);
 	}
 	progress_stop(&p);
 	return 1;
