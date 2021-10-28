@@ -55,7 +55,7 @@ For 64-bits windows, you can using `x86_64-w64-mingw32-` instead of `i686-w64-mi
 ## Usage
 
 ```shell
-xrock(v1.0.1) - https://github.com/xboot/xrock
+xrock(v1.0.2) - https://github.com/xboot/xrock
 usage:
     xrock maskrom <ddr> <usbplug>            - Initial chip using ddr and usbplug in maskrom mode
     xrock version                            - Show chip version
