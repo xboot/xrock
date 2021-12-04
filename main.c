@@ -115,8 +115,17 @@ int main(int argc, char * argv[])
 	if(argc < 2)
 	{
 		usage();
-		return -1;
+		return 0;
 	}
+	for(int i = 1; i < argc; i++)
+	{
+		if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help"))
+		{
+			usage();
+			return 0;
+		}
+	}
+
 	libusb_init(NULL);
 	if(!xrock_init(&ctx))
 	{
