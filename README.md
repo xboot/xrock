@@ -55,21 +55,20 @@ For 64-bits windows, you can using `x86_64-w64-mingw32-` instead of `i686-w64-mi
 ## Usage
 
 ```shell
-xrock(v1.0.2) - https://github.com/xboot/xrock
 usage:
-    xrock maskrom <ddr> <usbplug>            - Initial chip using ddr and usbplug in maskrom mode
-    xrock version                            - Show chip version
-    xrock capability                         - Show capability information
-    xrock reset [maskrom]                    - Reset chip to normal or maskrom mode
-    xrock hexdump <address> <length>         - Dumps memory region in hex
-    xrock dump <address> <length>            - Binary memory dump to stdout
-    xrock read <address> <length> <file>     - Read memory to file
-    xrock write <address> <file>             - Write file to memory
-    xrock exec <address>                     - Call function address
-    xrock flash                              - Detect flash and show information
-    xrock flash erase <sector> <count>       - Erase flash sector
-    xrock flash read <sector> <count> <file> - Read flash sector to file
-    xrock flash write <sector> <file>        - Write file to flash sector
+    xrock maskrom <ddr> <usbplug> [--rc4-off] - Initial chip using ddr and usbplug in maskrom mode
+    xrock version                             - Show chip version
+    xrock capability                          - Show capability information
+    xrock reset [maskrom]                     - Reset chip to normal or maskrom mode
+    xrock hexdump <address> <length>          - Dumps memory region in hex
+    xrock dump <address> <length>             - Binary memory dump to stdout
+    xrock read <address> <length> <file>      - Read memory to file
+    xrock write <address> <file>              - Write file to memory
+    xrock exec <address>                      - Call function address
+    xrock flash                               - Detect flash and show information
+    xrock flash erase <sector> <count>        - Erase flash sector
+    xrock flash read <sector> <count> <file>  - Read flash sector to file
+    xrock flash write <sector> <file>         - Write file to flash sector
 ```
 
 ## Tips
