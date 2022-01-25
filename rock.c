@@ -49,12 +49,12 @@ int xrock_init(struct xrock_ctx_t * ctx)
 		}
 		if(ctx->hdl && ctx->chip)
 		{
-		    if(libusb_kernel_driver_active(ctx->hdl, 0) == 1)
-		        libusb_detach_kernel_driver(ctx->hdl, 0);
-		    if(libusb_claim_interface(ctx->hdl, 0) == 0)
-		    {
-		    	if(libusb_get_device_descriptor(libusb_get_device(ctx->hdl), &desc) == 0)
-		    	{
+			if(libusb_kernel_driver_active(ctx->hdl, 0) == 1)
+				libusb_detach_kernel_driver(ctx->hdl, 0);
+			if(libusb_claim_interface(ctx->hdl, 0) == 0)
+			{
+				if(libusb_get_device_descriptor(libusb_get_device(ctx->hdl), &desc) == 0)
+				{
 					if((desc.bcdUSB & 0x0001) == 0x0000)
 						ctx->maskrom = 1;
 					else
@@ -119,7 +119,7 @@ void rock_maskrom_init_ddr(struct xrock_ctx_t * ctx, const char * filename, int 
 		buf[n++] = crc16 & 0xff;
 		libusb_control_transfer(ctx->hdl, LIBUSB_REQUEST_TYPE_VENDOR, 12, 0, 0x471, buf, n, 0);
 	}
-	usleep(100 * 1000);
+	usleep(1000);
 }
 
 void rock_maskrom_init_usbplug(struct xrock_ctx_t * ctx, const char * filename, int rc4)
@@ -152,7 +152,7 @@ void rock_maskrom_init_usbplug(struct xrock_ctx_t * ctx, const char * filename, 
 		buf[n++] = crc16 & 0xff;
 		libusb_control_transfer(ctx->hdl, LIBUSB_REQUEST_TYPE_VENDOR, 12, 0, 0x472, buf, n, 0);
 	}
-	usleep(100 * 1000);
+	usleep(1000);
 }
 
 enum {
