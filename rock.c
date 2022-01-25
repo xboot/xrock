@@ -89,64 +89,70 @@ int xrock_init(struct xrock_ctx_t * ctx)
 	return 0;
 }
 
-void rock_maskrom_init_ddr(struct xrock_ctx_t * ctx, const char * filename)
+void rock_maskrom_init_ddr(struct xrock_ctx_t * ctx, const char * filename, int rc4)
 {
-	struct rc4_ctx_t rc4;
+	struct rc4_ctx_t rctx;
 	uint8_t key[16] = { 124, 78, 3, 4, 85, 5, 9, 7, 45, 44, 123, 56, 23, 13, 23, 17 };
 	uint16_t crc16 = 0xffff;
 	uint8_t buf[4096 + 2];
 	FILE * f;
 	int n;
 
-	rc4_setkey(&rc4, key, sizeof(key));
+	rc4_setkey(&rctx, key, sizeof(key));
 	f = fopen(filename, "rb");
 	if(!f)
 		exit(-1);
 	while((n = fread(buf, 1, 4096, f)) == 4096)
 	{
-		rc4_crypt(&rc4, buf, n);
+		if(rc4)
+			rc4_crypt(&rctx, buf, n);
 		crc16 = crc16_sum(crc16, buf, n);
 		libusb_control_transfer(ctx->hdl, LIBUSB_REQUEST_TYPE_VENDOR, 12, 0, 0x471, buf, n, 0);
 	}
 	fclose(f);
 	if(n >= 0)
 	{
-		rc4_crypt(&rc4, buf, n);
+		if(rc4)
+			rc4_crypt(&rctx, buf, n);
 		crc16 = crc16_sum(crc16, buf, n);
 		buf[n++] = crc16 >> 8;
 		buf[n++] = crc16 & 0xff;
 		libusb_control_transfer(ctx->hdl, LIBUSB_REQUEST_TYPE_VENDOR, 12, 0, 0x471, buf, n, 0);
 	}
+	usleep(100 * 1000);
 }
 
-void rock_maskrom_init_usbplug(struct xrock_ctx_t * ctx, const char * filename)
+void rock_maskrom_init_usbplug(struct xrock_ctx_t * ctx, const char * filename, int rc4)
 {
-	struct rc4_ctx_t rc4;
+	struct rc4_ctx_t rctx;
 	uint8_t key[16] = { 124, 78, 3, 4, 85, 5, 9, 7, 45, 44, 123, 56, 23, 13, 23, 17 };
 	uint16_t crc16 = 0xffff;
 	uint8_t buf[4096 + 2];
 	FILE * f;
 	int n;
 
-	rc4_setkey(&rc4, key, sizeof(key));
+	rc4_setkey(&rctx, key, sizeof(key));
 	f = fopen(filename, "rb");
 	if(!f)
 		exit(-1);
 	while((n = fread(buf, 1, 4096, f)) == 4096)
 	{
-		rc4_crypt(&rc4, buf, n);
+		if(rc4)
+			rc4_crypt(&rctx, buf, n);
 		crc16 = crc16_sum(crc16, buf, n);
 		libusb_control_transfer(ctx->hdl, LIBUSB_REQUEST_TYPE_VENDOR, 12, 0, 0x472, buf, n, 0);
 	}
 	fclose(f);
 	if(n >= 0)
 	{
-		rc4_crypt(&rc4, buf, n);
+		if(rc4)
+			rc4_crypt(&rctx, buf, n);
 		crc16 = crc16_sum(crc16, buf, n);
 		buf[n++] = crc16 >> 8;
 		buf[n++] = crc16 & 0xff;
 		libusb_control_transfer(ctx->hdl, LIBUSB_REQUEST_TYPE_VENDOR, 12, 0, 0x472, buf, n, 0);
 	}
+	usleep(100 * 1000);
 }
 
 enum {

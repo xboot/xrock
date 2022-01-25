@@ -93,19 +93,19 @@ static void usage(void)
 {
 	printf("xrock(v1.0.2) - https://github.com/xboot/xrock\r\n");
 	printf("usage:\r\n");
-	printf("    xrock maskrom <ddr> <usbplug>            - Initial chip using ddr and usbplug in maskrom mode\r\n");
-	printf("    xrock version                            - Show chip version\r\n");
-	printf("    xrock capability                         - Show capability information\r\n");
-	printf("    xrock reset [maskrom]                    - Reset chip to normal or maskrom mode\n");
-	printf("    xrock hexdump <address> <length>         - Dumps memory region in hex\r\n");
-	printf("    xrock dump <address> <length>            - Binary memory dump to stdout\r\n");
-	printf("    xrock read <address> <length> <file>     - Read memory to file\r\n");
-	printf("    xrock write <address> <file>             - Write file to memory\r\n");
-	printf("    xrock exec <address>                     - Call function address\r\n");
-	printf("    xrock flash                              - Detect flash and show information\r\n");
-	printf("    xrock flash erase <sector> <count>       - Erase flash sector\r\n");
-	printf("    xrock flash read <sector> <count> <file> - Read flash sector to file\r\n");
-	printf("    xrock flash write <sector> <file>        - Write file to flash sector\r\n");
+	printf("    xrock maskrom <ddr> <usbplug> [--rc4-off] - Initial chip using ddr and usbplug in maskrom mode\r\n");
+	printf("    xrock version                             - Show chip version\r\n");
+	printf("    xrock capability                          - Show capability information\r\n");
+	printf("    xrock reset [maskrom]                     - Reset chip to normal or maskrom mode\n");
+	printf("    xrock hexdump <address> <length>          - Dumps memory region in hex\r\n");
+	printf("    xrock dump <address> <length>             - Binary memory dump to stdout\r\n");
+	printf("    xrock read <address> <length> <file>      - Read memory to file\r\n");
+	printf("    xrock write <address> <file>              - Write file to memory\r\n");
+	printf("    xrock exec <address>                      - Call function address\r\n");
+	printf("    xrock flash                               - Detect flash and show information\r\n");
+	printf("    xrock flash erase <sector> <count>        - Erase flash sector\r\n");
+	printf("    xrock flash read <sector> <count> <file>  - Read flash sector to file\r\n");
+	printf("    xrock flash write <sector> <file>         - Write file to flash sector\r\n");
 }
 
 int main(int argc, char * argv[])
@@ -139,12 +139,15 @@ int main(int argc, char * argv[])
 	{
 		argc -= 2;
 		argv += 2;
-		if(argc == 2)
+		if(argc >= 2)
 		{
 			if(ctx.maskrom)
 			{
-				rock_maskrom_init_ddr(&ctx, argv[0]);
-				rock_maskrom_init_usbplug(&ctx, argv[1]);
+				int rc4 = 1;
+				if((argc == 3) && !strcmp(argv[2], "--rc4-off"))
+					rc4 = 0;
+				rock_maskrom_init_ddr(&ctx, argv[0], rc4);
+				rock_maskrom_init_usbplug(&ctx, argv[1], rc4);
 			}
 			else
 				printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
