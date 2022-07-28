@@ -77,6 +77,13 @@ usage:
 
 - The memory base address from 0, **NOT** sdram's physical address.
 
+### RV1106
+
+```shell
+sudo xrock maskrom rv1106_ddr_924MHz_v1.07.bin rv1106_usbplug_v1.03.bin --rc4-off
+sudo xrock version
+```
+
 ### RK1808
 
 ```shell

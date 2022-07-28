@@ -1,6 +1,7 @@
 #include <rock.h>
 
 static struct chip_t chips[] = {
+	{ 0x110c, "RK1106" },
 	{ 0x180a, "RK1808" },
 	{ 0x281a, "RK2818" },
 	{ 0x290a, "RK2918" },
