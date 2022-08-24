@@ -101,7 +101,7 @@ sudo xrock version
 ### RK3288
 
 ```shell
-sudo xrock maskrom rk3288_ddr_400MHz_v1.09.bin rk3288_usbplug_v2.58.bin
+sudo xrock maskrom rk3288_ddr_400MHz_v1.11.bin rk3288_usbplug_v2.63.bin
 sudo xrock version
 ```
 
