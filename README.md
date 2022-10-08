@@ -7,6 +7,16 @@ The low level tools for rockchip SOC with maskrom and loader mode support.
 
 ### Linux platform
 
+Arch Linux is installed through the AUR repository:
+
+```shell
+# Release version
+yay -S xrock
+
+# Development version
+yay -S xrock-git
+```
+
 The xrock tools depends on the `libusb-1.0` library, you need to install `libusb-1.0-0-dev` before compile, for example in ubuntu:
 
 ```shell
