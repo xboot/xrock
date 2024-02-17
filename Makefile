@@ -2,15 +2,17 @@
 # Top makefile
 #
 
-CROSS		?=
+CROSS_COMPILE	?=
+DESTDIR			?=
+PREFIX			?=
 
-AS			:= $(CROSS)gcc -x assembler-with-cpp
-CC			:= $(CROSS)gcc
-CXX			:= $(CROSS)g++
-LD			:= $(CROSS)ld
-AR			:= $(CROSS)ar
-OC			:= $(CROSS)objcopy
-OD			:= $(CROSS)objdump
+AS			:= $(CROSS_COMPILE)as
+CC			:= $(CROSS_COMPILE)cc
+CXX			:= $(CROSS_COMPILE)c++
+LD			:= $(CROSS_COMPILE)ld
+AR			:= $(CROSS_COMPILE)ar
+OC			:= $(CROSS_COMPILE)objcopy
+OD			:= $(CROSS_COMPILE)objdump
 RM			:= rm -fr
 
 ASFLAGS		:= -g -ggdb -Wall -O3
@@ -68,10 +70,10 @@ $(CPPOBJS) : %.o : %.cpp
 	@$(CXX) $(CXXFLAGS) -MD -MP -MF $@.d $(INCDIRS) -c $< -o $@
 
 install:
-	install -Dm0755 xrock /usr/local/bin/xrock
-	install -Dm0644 99-xrock.rules /etc/udev/rules.d/99-xrock.rules
-	install -Dm0644 LICENSE /usr/share/licenses/xrock/LICENSE
-	udevadm control --reload
+	install -Dm0755 xrock $(DESTDIR)$(PREFIX)/bin/xrock
+	install -Dm0644 99-xrock.rules $(DESTDIR)$(PREFIX)/etc/udev/rules.d/99-xrock.rules
+	install -Dm0644 LICENSE $(DESTDIR)$(PREFIX)/share/licenses/xrock/LICENSE
+	@if [ "$(shell uname)" = "Linux" ]; then echo "Reloading udvadm rules"; udevadm control --reload; fi
 
 clean:
 	@$(RM) $(DEPS) $(OBJS) $(NAME).exe $(NAME) *~
