@@ -16,7 +16,7 @@ RM			:= rm -fr
 ASFLAGS		:= -g -ggdb -Wall -O3
 CFLAGS		:= -g -ggdb -Wall -O3
 CXXFLAGS	:= -g -ggdb -Wall -O3
-LDFLAGS		:=
+LDFLAGS		:= -Wl,-z,relro -Wl,-z,now -Wl,-z,shstk
 ARFLAGS		:= -rcs
 OCFLAGS		:= -v -O binary
 ODFLAGS		:=
@@ -68,9 +68,9 @@ $(CPPOBJS) : %.o : %.cpp
 	@$(CXX) $(CXXFLAGS) -MD -MP -MF $@.d $(INCDIRS) -c $< -o $@
 
 install:
-	install -Dm0755 xrock /usr/local/bin/xrock
-	install -Dm0644 99-xrock.rules /etc/udev/rules.d/99-xrock.rules
-	install -Dm0644 LICENSE /usr/share/licenses/xrock/LICENSE
+	install -Dm0755 xrock $(DESTDIR)$(PREFIX)/usr/local/bin/xrock
+	install -Dm0644 99-xrock.rules $(DESTDIR)$(PREFIX)/lib/udev/rules.d/99-xrock.rules
+	install -Dm0644 LICENSE $(DESTDIR)$(PREFIX)/usr/share/licenses/xrock/LICENSE
 	udevadm control --reload
 
 clean:
