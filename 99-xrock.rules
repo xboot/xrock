@@ -25,5 +25,7 @@ ATTRS{idVendor}=="2207", ATTRS{idProduct}=="330d", MODE="0666", GROUP="users" TE
 ATTRS{idVendor}=="2207", ATTRS{idProduct}=="330e", MODE="0666", GROUP="users" TEST=="power/autosuspend", ATTR{power/autosuspend}="-1"
 ATTRS{idVendor}=="2207", ATTRS{idProduct}=="350a", MODE="0666", GROUP="users" TEST=="power/autosuspend", ATTR{power/autosuspend}="-1"
 ATTRS{idVendor}=="2207", ATTRS{idProduct}=="350b", MODE="0666", GROUP="users" TEST=="power/autosuspend", ATTR{power/autosuspend}="-1"
+ATTRS{idVendor}=="2207", ATTRS{idProduct}=="350d", MODE="0666", GROUP="users" TEST=="power/autosuspend", ATTR{power/autosuspend}="-1"
+ATTRS{idVendor}=="2207", ATTRS{idProduct}=="350e", MODE="0666", GROUP="users" TEST=="power/autosuspend", ATTR{power/autosuspend}="-1"
 
 LABEL="end_rules"
