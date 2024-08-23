@@ -164,6 +164,13 @@ sudo xrock maskrom rk3588_ddr_lp4_2112MHz_lp5_2736MHz_v1.05.bin rk3588_usbplug_v
 sudo xrock version
 ```
 
+### RK3562
+
+```shell
+sudo xrock maskrom rk3562_ddr_1332MHz_v1.05.bin rk3562_usbplug_v1.04.bin --rc4-off
+sudo xrock version
+```
+
 ## Links
 
 * [The rockchip loader binaries](https://github.com/rockchip-linux/rkbin)
