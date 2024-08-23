@@ -30,50 +30,64 @@ int xrock_init(struct xrock_ctx_t * ctx)
 {
 	if(ctx)
 	{
-		struct libusb_device_descriptor desc;
-		struct libusb_config_descriptor * config;
-		int if_idx, set_idx, ep_idx;
-		const struct libusb_interface * iface;
-		const struct libusb_interface_descriptor * setting;
-		const struct libusb_endpoint_descriptor * ep;
-		libusb_device_handle * hdl;
-		int i;
+		libusb_device ** list = NULL;
+		int found = 0;
 
 		ctx->hdl = NULL;
 		ctx->chip = NULL;
-		for(i = 0; i < ARRAY_SIZE(chips); i++)
+		for(int count = 0; (count < libusb_get_device_list(ctx->context, &list)) && !found; count++)
 		{
-			hdl = libusb_open_device_with_vid_pid(NULL, 0x2207, chips[i].pid);
-			if(hdl)
+			struct libusb_device_descriptor desc;
+			libusb_device * device = list[count];
+			libusb_device_handle * hdl;
+			if(libusb_get_device_descriptor(device, &desc) == 0)
 			{
-				ctx->hdl = hdl;
-				ctx->chip = &chips[i];
-				break;
+				if(desc.idVendor == 0x2207)
+				{
+					for(int i = 0; i < ARRAY_SIZE(chips); i++)
+					{
+						if(desc.idProduct == chips[i].pid)
+						{
+							if(libusb_open(device, &hdl) == 0)
+							{
+								ctx->hdl = hdl;
+								ctx->chip = &chips[i];
+								found = 1;
+								break;
+							}
+						}
+					}
+				}
 			}
 		}
-		if(ctx->hdl && ctx->chip)
+
+		if(ctx->hdl && ctx->chip && (found == 1))
 		{
-			if(libusb_kernel_driver_active(ctx->hdl, 0) == 1)
+			if(libusb_kernel_driver_active(ctx->hdl, 0))
 				libusb_detach_kernel_driver(ctx->hdl, 0);
+
 			if(libusb_claim_interface(ctx->hdl, 0) == 0)
 			{
+				struct libusb_device_descriptor desc;
 				if(libusb_get_device_descriptor(libusb_get_device(ctx->hdl), &desc) == 0)
 				{
 					if((desc.bcdUSB & 0x0001) == 0x0000)
 						ctx->maskrom = 1;
 					else
 						ctx->maskrom = 0;
+
+					struct libusb_config_descriptor * config;
 					if(libusb_get_active_config_descriptor(libusb_get_device(ctx->hdl), &config) == 0)
 					{
-						for(if_idx = 0; if_idx < config->bNumInterfaces; if_idx++)
+						for(int if_idx = 0; if_idx < config->bNumInterfaces; if_idx++)
 						{
-							iface = config->interface + if_idx;
-							for(set_idx = 0; set_idx < iface->num_altsetting; set_idx++)
+							const struct libusb_interface * iface = config->interface + if_idx;
+							for(int set_idx = 0; set_idx < iface->num_altsetting; set_idx++)
 							{
-								setting = iface->altsetting + set_idx;
-								for(ep_idx = 0; ep_idx < setting->bNumEndpoints; ep_idx++)
+								const struct libusb_interface_descriptor * setting = iface->altsetting + set_idx;
+								for(int ep_idx = 0; ep_idx < setting->bNumEndpoints; ep_idx++)
 								{
-									ep = setting->endpoint + ep_idx;
+									const struct libusb_endpoint_descriptor * ep = setting->endpoint + ep_idx;
 									if((ep->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) != LIBUSB_TRANSFER_TYPE_BULK)
 										continue;
 									if((ep->bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN)

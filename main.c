@@ -91,7 +91,7 @@ static const char * manufacturer[] = {
 
 static void usage(void)
 {
-	printf("xrock(v1.0.4) - https://github.com/xboot/xrock\r\n");
+	printf("xrock(v1.0.5) - https://github.com/xboot/xrock\r\n");
 	printf("usage:\r\n");
 	printf("    xrock maskrom <ddr> <usbplug> [--rc4-off] - Initial chip using ddr and usbplug in maskrom mode\r\n");
 	printf("    xrock version                             - Show chip version\r\n");
@@ -126,13 +126,13 @@ int main(int argc, char * argv[])
 		}
 	}
 
-	libusb_init(NULL);
+	libusb_init(&ctx.context);
 	if(!xrock_init(&ctx))
 	{
 		printf("ERROR: Can't found any supported rockchip chips\r\n");
 		if(ctx.hdl)
 			libusb_close(ctx.hdl);
-		libusb_exit(NULL);
+		libusb_exit(ctx.context);
 		return -1;
 	}
 	if(!strcmp(argv[1], "maskrom"))
@@ -419,7 +419,7 @@ int main(int argc, char * argv[])
 		usage();
 	if(ctx.hdl)
 		libusb_close(ctx.hdl);
-	libusb_exit(NULL);
+	libusb_exit(ctx.context);
 
 	return 0;
 }

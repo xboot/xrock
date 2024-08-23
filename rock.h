@@ -17,6 +17,7 @@ struct chip_t {
 };
 
 struct xrock_ctx_t {
+	libusb_context * context;
 	libusb_device_handle * hdl;
 	struct chip_t * chip;
 	int epout;
