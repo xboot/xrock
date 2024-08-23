@@ -2,7 +2,7 @@
 # Top makefile
 #
 
-CROSS		?=
+CROSS		?= x86_64-w64-mingw32-
 
 AS			:= $(CROSS)gcc -x assembler-with-cpp
 CC			:= $(CROSS)gcc
@@ -23,9 +23,9 @@ ODFLAGS		:=
 MCFLAGS		:=
 
 LIBDIRS		:=
-LIBS 		:= `pkg-config --libs libusb-1.0`
+LIBS 		:= -L/usr/x86_64-w64-mingw32/lib -lusb-1.0
 
-INCDIRS		:= -I . `pkg-config --cflags libusb-1.0`
+INCDIRS		:= -I . -I /usr/x86_64-w64-mingw32/include/libusb-1.0
 SRCDIRS		:= .
 
 SFILES		:= $(foreach dir, $(SRCDIRS), $(wildcard $(dir)/*.S))
@@ -52,7 +52,7 @@ all : $(NAME)
 
 $(NAME) : $(OBJS)
 	@echo [LD] Linking $@
-	@$(CC) $(LDFLAGS) $(LIBDIRS) $^ -o $@ $(LIBS)
+	@$(CC) $(LDFLAGS) $(LIBDIRS) $^ -o $@ $(LIBS) -static
 
 $(SOBJS) : %.o : %.S
 	@echo [AS] $<
