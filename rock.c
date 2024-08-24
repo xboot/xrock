@@ -121,70 +121,73 @@ int xrock_init(struct xrock_ctx_t * ctx)
 	return 0;
 }
 
-void rock_maskrom_init_ddr(struct xrock_ctx_t * ctx, const char * filename, int rc4)
+static int rock_maskrom_upload_memory(struct xrock_ctx_t * ctx, uint32_t code, void * buf, uint64_t len)
 {
-	struct rc4_ctx_t rctx;
-	uint8_t key[16] = { 124, 78, 3, 4, 85, 5, 9, 7, 45, 44, 123, 56, 23, 13, 23, 17 };
+	uint64_t total = 0;
 	uint16_t crc16 = 0xffff;
-	uint8_t buf[4096 + 2];
-	FILE * f;
-	int n;
+	int pend = 0;
+	unsigned char * buffer;
 
-	rc4_setkey(&rctx, key, sizeof(key));
-	f = fopen(filename, "rb");
-	if(!f)
-		exit(-1);
-	while((n = fread(buf, 1, 4096, f)) == 4096)
+	buffer = malloc(len + 5);
+	if(buffer)
 	{
-		if(rc4)
-			rc4_crypt(&rctx, buf, n);
-		crc16 = crc16_sum(crc16, buf, n);
-		libusb_control_transfer(ctx->hdl, LIBUSB_REQUEST_TYPE_VENDOR, 12, 0, 0x471, buf, n, 0);
+		memset(buffer, 0, len + 5);
+		memcpy(buffer, buf, len);
+		switch(len % 4096)
+		{
+		case 4095:
+			len++;
+			break;
+		case 4094:
+			pend = 1;
+			break;
+		case 0:
+		default:
+			break;
+		}
+
+		crc16 = crc16_sum(crc16, buffer, len);
+		buffer[len++] = crc16 >> 8;
+		buffer[len++] = crc16 & 0xff;
+		while(total < len)
+		{
+			int n = ((len - total) > 4096) ? 4096 : (len - total);
+			if(libusb_control_transfer(ctx->hdl, LIBUSB_REQUEST_TYPE_VENDOR, 0xc, 0, code, buffer + total, n, 0) != n)
+			{
+				free(buffer);
+				return 0;
+			}
+			total += n;
+		}
+		if(pend)
+		{
+			unsigned char zero = 0;
+			libusb_control_transfer(ctx->hdl, LIBUSB_REQUEST_TYPE_VENDOR, 0xc, 0, code, &zero, 1, 0);
+		}
+		free(buffer);
+		return 1;
 	}
-	fclose(f);
-	if(n >= 0)
-	{
-		if(rc4)
-			rc4_crypt(&rctx, buf, n);
-		crc16 = crc16_sum(crc16, buf, n);
-		buf[n++] = crc16 >> 8;
-		buf[n++] = crc16 & 0xff;
-		libusb_control_transfer(ctx->hdl, LIBUSB_REQUEST_TYPE_VENDOR, 12, 0, 0x471, buf, n, 0);
-	}
-	usleep(1000);
+	return 0;
 }
 
-void rock_maskrom_init_usbplug(struct xrock_ctx_t * ctx, const char * filename, int rc4)
+void rock_maskrom_upload(struct xrock_ctx_t * ctx, uint32_t code, const char * filename, int rc4)
 {
 	struct rc4_ctx_t rctx;
 	uint8_t key[16] = { 124, 78, 3, 4, 85, 5, 9, 7, 45, 44, 123, 56, 23, 13, 23, 17 };
-	uint16_t crc16 = 0xffff;
-	uint8_t buf[4096 + 2];
-	FILE * f;
-	int n;
+	uint64_t len;
+	void * buf;
 
-	rc4_setkey(&rctx, key, sizeof(key));
-	f = fopen(filename, "rb");
-	if(!f)
-		exit(-1);
-	while((n = fread(buf, 1, 4096, f)) == 4096)
+	buf = file_load(filename, &len);
+	if(buf)
 	{
 		if(rc4)
-			rc4_crypt(&rctx, buf, n);
-		crc16 = crc16_sum(crc16, buf, n);
-		libusb_control_transfer(ctx->hdl, LIBUSB_REQUEST_TYPE_VENDOR, 12, 0, 0x472, buf, n, 0);
+		{
+			rc4_setkey(&rctx, key, sizeof(key));
+			rc4_crypt(&rctx, buf, len);
+		}
+		rock_maskrom_upload_memory(ctx, code, buf, len);
+		free(buf);
 	}
-	fclose(f);
-	if(n >= 0)
-	{
-		if(rc4)
-			rc4_crypt(&rctx, buf, n);
-		crc16 = crc16_sum(crc16, buf, n);
-		buf[n++] = crc16 >> 8;
-		buf[n++] = crc16 & 0xff;
-		libusb_control_transfer(ctx->hdl, LIBUSB_REQUEST_TYPE_VENDOR, 12, 0, 0x472, buf, n, 0);
-	}
-	usleep(1000);
 }
 
 enum {

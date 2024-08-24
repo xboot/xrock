@@ -69,8 +69,10 @@ int main(int argc, char * argv[])
 				int rc4 = 1;
 				if((argc == 3) && !strcmp(argv[2], "--rc4-off"))
 					rc4 = 0;
-				rock_maskrom_init_ddr(&ctx, argv[0], rc4);
-				rock_maskrom_init_usbplug(&ctx, argv[1], rc4);
+				rock_maskrom_upload(&ctx, 0x471, argv[0], rc4);
+				usleep(1000);
+				rock_maskrom_upload(&ctx, 0x472, argv[1], rc4);
+				usleep(1000);
 			}
 			else
 				printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
