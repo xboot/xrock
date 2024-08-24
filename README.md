@@ -46,7 +46,7 @@ Build xrock source code
 
 ```shell
 cd xrock
-CROSS=x86_64-w64-mingw32- make
+CROSS=x86_64-w64-mingw32- make -f Makefile.win
 ```
 
 For 32-bits windows, you can using `i686-w64-mingw32-` instead of `x86_64-w64-mingw32` above.
