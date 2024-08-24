@@ -9,6 +9,7 @@ extern "C" {
 #include <rc4.h>
 #include <crc16.h>
 #include <crc32.h>
+#include <misc.h>
 #include <progress.h>
 
 struct chip_t {
