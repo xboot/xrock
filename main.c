@@ -14,7 +14,7 @@ static const char * manufacturer[] = {
 
 static void usage(void)
 {
-	printf("xrock(v1.0.5) - https://github.com/xboot/xrock\r\n");
+	printf("xrock(v1.0.6) - https://github.com/xboot/xrock\r\n");
 	printf("usage:\r\n");
 	printf("    xrock maskrom <ddr> <usbplug> [--rc4-off] - Initial chip using ddr and usbplug in maskrom mode\r\n");
 	printf("    xrock ready                               - Show chip ready or not\r\n");
