@@ -109,14 +109,17 @@ int main(int argc, char * argv[])
 			printf("Capability: %02x %02x %02x %02x %02x %02x %02x %02x\r\n",
 				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]);
 			printf("    Direct LBA: %s\r\n", (buf[0] & (1 << 0)) ? "enabled" : "disabled");
-			printf("    Vendor storage: %s\r\n", (buf[0] & (1 << 1)) ? "enabled" : "disabled");
-			printf("    First 4M access: %s\r\n", (buf[0] & (1 << 2)) ? "enabled" : "disabled");
+			printf("    Vendor Storage: %s\r\n", (buf[0] & (1 << 1)) ? "enabled" : "disabled");
+			printf("    First 4M Access: %s\r\n", (buf[0] & (1 << 2)) ? "enabled" : "disabled");
 			printf("    Read LBA: %s\r\n", (buf[0] & (1 << 3)) ? "enabled" : "disabled");
-			printf("    Read com log: %s\r\n", (buf[0] & (1 << 5)) ? "enabled" : "disabled");
-			printf("    Read IDB config: %s\r\n", (buf[0] & (1 << 6)) ? "enabled" : "disabled");
-			printf("    Read secure mode: %s\r\n", (buf[0] & (1 << 7)) ? "enabled" : "disabled");
+			printf("    Read Com Log: %s\r\n", (buf[0] & (1 << 5)) ? "enabled" : "disabled");
+			printf("    Read IDB Config: %s\r\n", (buf[0] & (1 << 6)) ? "enabled" : "disabled");
+			printf("    Read Secure Mode: %s\r\n", (buf[0] & (1 << 7)) ? "enabled" : "disabled");
 			printf("    New IDB: %s\r\n", (buf[1] & (1 << 0)) ? "enabled" : "disabled");
 			printf("    Switch Storage: %s\r\n", (buf[1] & (1 << 1)) ? "enabled" : "disabled");
+			printf("    LBA Parity: %s\r\n", (buf[1] & (1 << 2)) ? "enabled" : "disabled");
+			printf("    Read OTP Chip: %s\r\n", (buf[1] & (1 << 3)) ? "enabled" : "disabled");
+			printf("    Switch USB3: %s\r\n", (buf[1] & (1 << 4)) ? "enabled" : "disabled");
 		}
 		else
 			printf("Failed to show capability information\r\n");
