@@ -84,9 +84,9 @@ int main(int argc, char * argv[])
 	else if(!strcmp(argv[1], "ready"))
 	{
 		if(rock_ready(&ctx))
-			printf("The device is ready\r\n");
+			printf("The chip is ready\r\n");
 		else
-			printf("The device is not ready\r\n");
+			printf("Failed to show chip ready status\r\n");
 	}
 	else if(!strcmp(argv[1], "version"))
 	{
