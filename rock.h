@@ -39,8 +39,7 @@ struct flash_info_t {
 
 int xrock_init(struct xrock_ctx_t * ctx);
 void rock_maskrom_upload(struct xrock_ctx_t * ctx, uint32_t code, const char * filename, int rc4);
-void rock_maskrom_init_ddr(struct xrock_ctx_t * ctx, const char * filename, int rc4);
-void rock_maskrom_init_usbplug(struct xrock_ctx_t * ctx, const char * filename, int rc4);
+int rock_ready(struct xrock_ctx_t * ctx);
 int rock_version(struct xrock_ctx_t * ctx, uint8_t * buf);
 int rock_capability(struct xrock_ctx_t * ctx, uint8_t * buf);
 int rock_reset(struct xrock_ctx_t * ctx, int maskrom);

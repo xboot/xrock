@@ -17,6 +17,7 @@ static void usage(void)
 	printf("xrock(v1.0.5) - https://github.com/xboot/xrock\r\n");
 	printf("usage:\r\n");
 	printf("    xrock maskrom <ddr> <usbplug> [--rc4-off] - Initial chip using ddr and usbplug in maskrom mode\r\n");
+	printf("    xrock ready                               - Show chip ready or not\r\n");
 	printf("    xrock version                             - Show chip version\r\n");
 	printf("    xrock capability                          - Show capability information\r\n");
 	printf("    xrock reset [maskrom]                     - Reset chip to normal or maskrom mode\n");
@@ -79,6 +80,13 @@ int main(int argc, char * argv[])
 		}
 		else
 			usage();
+	}
+	else if(!strcmp(argv[1], "ready"))
+	{
+		if(rock_ready(&ctx))
+			printf("The device is ready\r\n");
+		else
+			printf("The device is not ready\r\n");
 	}
 	else if(!strcmp(argv[1], "version"))
 	{

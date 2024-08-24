@@ -57,6 +57,7 @@ For 32-bits windows, you can using `i686-w64-mingw32-` instead of `x86_64-w64-mi
 ```shell
 usage:
     xrock maskrom <ddr> <usbplug> [--rc4-off] - Initial chip using ddr and usbplug in maskrom mode
+    xrock ready                               - Show chip ready or not
     xrock version                             - Show chip version
     xrock capability                          - Show capability information
     xrock reset [maskrom]                     - Reset chip to normal or maskrom mode
