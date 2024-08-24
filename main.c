@@ -106,6 +106,7 @@ int main(int argc, char * argv[])
 			printf("    Read IDB config: %s\r\n", (buf[0] & (1 << 6)) ? "enabled" : "disabled");
 			printf("    Read secure mode: %s\r\n", (buf[0] & (1 << 7)) ? "enabled" : "disabled");
 			printf("    New IDB: %s\r\n", (buf[1] & (1 << 0)) ? "enabled" : "disabled");
+			printf("    Switch Storage: %s\r\n", (buf[1] & (1 << 1)) ? "enabled" : "disabled");
 		}
 		else
 			printf("Failed to show capability information\r\n");
