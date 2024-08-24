@@ -26,6 +26,10 @@ static struct chip_t chips[] = {
 	{ 0x350e, "RK3576" },
 };
 
+static struct chip_t chip_unknown = {
+	0x0000, "UNKNOWN"
+};
+
 int xrock_init(struct xrock_ctx_t * ctx)
 {
 	if(ctx)
@@ -57,11 +61,21 @@ int xrock_init(struct xrock_ctx_t * ctx)
 							}
 						}
 					}
+					if(!found)
+					{
+						if(libusb_open(device, &hdl) == 0)
+						{
+							ctx->hdl = hdl;
+							ctx->chip = &chip_unknown;
+							found = 1;
+							break;
+						}
+					}
 				}
 			}
 		}
 
-		if(ctx->hdl && ctx->chip && (found == 1))
+		if(ctx->hdl && ctx->chip && found)
 		{
 			if(libusb_kernel_driver_active(ctx->hdl, 0))
 				libusb_detach_kernel_driver(ctx->hdl, 0);
