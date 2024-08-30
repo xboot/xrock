@@ -243,9 +243,9 @@ struct usb_command_t {
 } __attribute__((packed));
 
 struct usb_request_t {
-	uint32_t signature;			/* Contains 'USBC' */
-	uint32_t tag;				/* The random unique id */
-	uint32_t dsize;				/* The size of data (transfer length) */
+	uint8_t signature[4];		/* Contains 'USBC' */
+	uint8_t tag[4];				/* The random unique id */
+	uint8_t length[4];			/* The data transfer length */
 	uint8_t flag;				/* Direction in bit 7, IN(0x80), OUT(0x00) */
 	uint8_t lun;				/* Lun (Flash chip select, normally 0) */
 	uint8_t cmdlen;				/* Command Length 6/10/16 */
@@ -253,9 +253,9 @@ struct usb_request_t {
 } __attribute__((packed));
 
 struct usb_response_t {
-	uint32_t signature;			/* Contains 'USBS' */
-	uint32_t tag;				/* Same as original command */
-	uint32_t residue;			/* Amount not transferred */
+	uint8_t signature[4];		/* Contains 'USBS' */
+	uint8_t tag[4];				/* Same as original command */
+	uint8_t residue[4];			/* Amount not transferred */
 	uint8_t status;				/* Response status */
 } __attribute__((packed));
 
@@ -296,6 +296,31 @@ static inline void usb_bulk_recv(libusb_device_handle * hdl, int ep, void * buf,
 	}
 }
 
+static void write_be16(void * addr, uint16_t val)
+{
+	uint8_t * p = (uint8_t *)addr;
+
+	p[1] = (val >> 0) & 0xff;
+	p[0] = (val >> 8) & 0xff;
+}
+
+static void write_be32(void * addr, uint32_t val)
+{
+	uint8_t * p = (uint8_t *)addr;
+
+	p[3] = (val >> 0) & 0xff;
+	p[2] = (val >> 8) & 0xff;
+	p[1] = (val >> 16) & 0xff;
+	p[0] = (val >> 24) & 0xff;
+}
+
+static uint32_t read_be32(void * addr)
+{
+	uint8_t * p = (uint8_t *)addr;
+
+	return (uint32_t)((p[0] << 24) | (p[1] << 16) | (p[2] << 8) | (p[3] << 0));
+}
+
 static inline uint32_t make_tag(void)
 {
 	uint32_t tag = 0;
@@ -312,9 +337,9 @@ int rock_ready(struct xrock_ctx_t * ctx)
 	struct usb_response_t res;
 
 	memset(&req, 0, sizeof(struct usb_request_t));
-	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
-	req.tag = cpu_to_be32(make_tag());
-	req.dsize = 0;
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_be32(&req.length[0], 0);
 	req.flag = USB_DIRECTION_IN;
 	req.cmdlen = 6;
 	req.cmd.opcode = OPCODE_TEST_UNIT_READY;
@@ -322,7 +347,7 @@ int rock_ready(struct xrock_ctx_t * ctx)
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
-	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
 		return 0;
 	return 1;
 }
@@ -333,9 +358,9 @@ int rock_version(struct xrock_ctx_t * ctx, uint8_t * buf)
 	struct usb_response_t res;
 
 	memset(&req, 0, sizeof(struct usb_request_t));
-	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
-	req.tag = cpu_to_be32(make_tag());
-	req.dsize = 16;
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_be32(&req.length[0], 16);
 	req.flag = USB_DIRECTION_IN;
 	req.cmdlen = 6;
 	req.cmd.opcode = OPCODE_READ_CHIP_INFO;
@@ -343,7 +368,7 @@ int rock_version(struct xrock_ctx_t * ctx, uint8_t * buf)
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, buf, 16);
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
-	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
 		return 0;
 	return 1;
 }
@@ -354,16 +379,16 @@ int rock_capability(struct xrock_ctx_t * ctx, uint8_t * buf)
 	struct usb_response_t res;
 
 	memset(&req, 0, sizeof(struct usb_request_t));
-	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
-	req.tag = cpu_to_be32(make_tag());
-	req.dsize = 8;
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_be32(&req.length[0], 8);
 	req.flag = USB_DIRECTION_IN;
 	req.cmdlen = 6;
 	req.cmd.opcode = OPCODE_READ_CAPABILITY;
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, buf, 8);
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
-	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
 		return 0;
 	return 1;
 }
@@ -374,8 +399,9 @@ int rock_reset(struct xrock_ctx_t * ctx, int maskrom)
 	struct usb_response_t res;
 
 	memset(&req, 0, sizeof(struct usb_request_t));
-	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
-	req.tag = cpu_to_be32(make_tag());
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_be32(&req.length[0], 0);
 	req.flag = USB_DIRECTION_OUT;
 	req.cmdlen = 6;
 	req.cmd.opcode = OPCODE_RESET_DEVICE;
@@ -383,7 +409,7 @@ int rock_reset(struct xrock_ctx_t * ctx, int maskrom)
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
-	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
 		return 0;
 	return 1;
 }
@@ -394,8 +420,9 @@ int rock_exec(struct xrock_ctx_t * ctx, uint32_t addr)
 	struct usb_response_t res;
 
 	memset(&req, 0, sizeof(struct usb_request_t));
-	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
-	req.tag = cpu_to_be32(make_tag());
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_be32(&req.length[0], 0);
 	req.flag = USB_DIRECTION_OUT;
 	req.cmdlen = 10;
 	req.cmd.opcode = OPCODE_EXEC_SDRAM;
@@ -404,7 +431,7 @@ int rock_exec(struct xrock_ctx_t * ctx, uint32_t addr)
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
-	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
 		return 0;
 	return 1;
 }
@@ -415,8 +442,9 @@ static inline int rock_read_raw(struct xrock_ctx_t * ctx, uint32_t addr, void * 
 	struct usb_response_t res;
 
 	memset(&req, 0, sizeof(struct usb_request_t));
-	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
-	req.tag = cpu_to_be32(make_tag());
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_be32(&req.length[0], 0);
 	req.flag = USB_DIRECTION_IN;
 	req.cmdlen = 10;
 	req.cmd.opcode = OPCODE_READ_SDRAM;
@@ -426,7 +454,7 @@ static inline int rock_read_raw(struct xrock_ctx_t * ctx, uint32_t addr, void * 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, buf, len);
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
-	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
 		return 0;
 	return 1;
 }
@@ -437,8 +465,9 @@ static inline int rock_write_raw(struct xrock_ctx_t * ctx, uint32_t addr, void *
 	struct usb_response_t res;
 
 	memset(&req, 0, sizeof(struct usb_request_t));
-	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
-	req.tag = cpu_to_be32(make_tag());
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_be32(&req.length[0], 0);
 	req.flag = USB_DIRECTION_OUT;
 	req.cmdlen = 10;
 	req.cmd.opcode = OPCODE_WRITE_SDRAM;
@@ -448,7 +477,7 @@ static inline int rock_write_raw(struct xrock_ctx_t * ctx, uint32_t addr, void *
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_send(ctx->hdl, ctx->epout, buf, len);
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
-	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
 		return 0;
 	return 1;
 }
@@ -531,28 +560,28 @@ int rock_flash_detect(struct xrock_ctx_t * ctx, struct flash_info_t * info)
 	struct usb_response_t res;
 
 	memset(&req, 0, sizeof(struct usb_request_t));
-	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
-	req.tag = cpu_to_be32(make_tag());
-	req.dsize = 11;
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_be32(&req.length[0], 11);
 	req.flag = USB_DIRECTION_IN;
 	req.cmdlen = 6;
 	req.cmd.opcode = OPCODE_READ_FLASH_INFO;
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, info, 11);
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
-	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
 		return 0;
 	memset(&req, 0, sizeof(struct usb_request_t));
-	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
-	req.tag = cpu_to_be32(make_tag());
-	req.dsize = 5;
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_be32(&req.length[0], 5);
 	req.flag = USB_DIRECTION_IN;
 	req.cmdlen = 6;
 	req.cmd.opcode = OPCODE_READ_FLASH_ID;
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, &info->id[0], 5);
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
-	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
 		return 0;
 	return 1;
 }
@@ -563,8 +592,9 @@ static inline int rock_flash_erase_lba_raw(struct xrock_ctx_t * ctx, uint32_t se
 	struct usb_response_t res;
 
 	memset(&req, 0, sizeof(struct usb_request_t));
-	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
-	req.tag = cpu_to_be32(make_tag());
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_be32(&req.length[0], 0);
 	req.flag = USB_DIRECTION_OUT;
 	req.cmdlen = 10;
 	req.cmd.opcode = OPCODE_ERASE_LBA;
@@ -573,7 +603,7 @@ static inline int rock_flash_erase_lba_raw(struct xrock_ctx_t * ctx, uint32_t se
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
-	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
 		return 0;
 	return 1;
 }
@@ -584,9 +614,9 @@ static inline int rock_flash_read_lba_raw(struct xrock_ctx_t * ctx, uint32_t sec
 	struct usb_response_t res;
 
 	memset(&req, 0, sizeof(struct usb_request_t));
-	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
-	req.tag = cpu_to_be32(make_tag());
-	req.dsize = cnt << 9;
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_be32(&req.length[0], cnt << 9);
 	req.flag = USB_DIRECTION_IN;
 	req.cmdlen = 10;
 	req.cmd.opcode = OPCODE_READ_LBA;
@@ -597,7 +627,7 @@ static inline int rock_flash_read_lba_raw(struct xrock_ctx_t * ctx, uint32_t sec
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, buf, cnt << 9);
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
-	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
 		return 0;
 	return 1;
 }
@@ -608,9 +638,9 @@ static inline int rock_flash_write_lba_raw(struct xrock_ctx_t * ctx, uint32_t se
 	struct usb_response_t res;
 
 	memset(&req, 0, sizeof(struct usb_request_t));
-	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
-	req.tag = cpu_to_be32(make_tag());
-	req.dsize = cnt << 9;
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_be32(&req.length[0], cnt << 9);
 	req.flag = USB_DIRECTION_OUT;
 	req.cmdlen = 10;
 	req.cmd.opcode = OPCODE_WRITE_LBA;
@@ -621,7 +651,7 @@ static inline int rock_flash_write_lba_raw(struct xrock_ctx_t * ctx, uint32_t se
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_send(ctx->hdl, ctx->epout, buf, cnt << 9);
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
-	if((be32_to_cpu(res.signature) != USB_RESPONSE_SIGN) || (res.tag != req.tag))
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
 		return 0;
 	return 1;
 }
