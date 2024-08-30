@@ -310,7 +310,7 @@ int rock_ready(struct xrock_ctx_t * ctx)
 	memset(&req, 0, sizeof(struct usb_request_t));
 	req.signature = cpu_to_be32(USB_REQUEST_SIGN);
 	req.tag = cpu_to_be32(make_tag());
-	req.dsize = 16;
+	req.dsize = 0;
 	req.flag = USB_DIRECTION_IN;
 	req.length = 6;
 	req.opcode = OPCODE_TEST_UNIT_READY;
