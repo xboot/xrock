@@ -65,7 +65,7 @@ usage:
     xrock dump <address> <length>             - Binary memory dump to stdout
     xrock read <address> <length> <file>      - Read memory to file
     xrock write <address> <file>              - Write file to memory
-    xrock exec <address>                      - Call function address
+    xrock exec <address> [dtb]                - Call function address
     xrock flash                               - Detect flash and show information
     xrock flash erase <sector> <count>        - Erase flash sector
     xrock flash read <sector> <count> <file>  - Read flash sector to file

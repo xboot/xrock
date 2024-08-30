@@ -43,7 +43,7 @@ int rock_ready(struct xrock_ctx_t * ctx);
 int rock_version(struct xrock_ctx_t * ctx, uint8_t * buf);
 int rock_capability(struct xrock_ctx_t * ctx, uint8_t * buf);
 int rock_reset(struct xrock_ctx_t * ctx, int maskrom);
-int rock_exec(struct xrock_ctx_t * ctx, uint32_t addr);
+int rock_exec(struct xrock_ctx_t * ctx, uint32_t addr, uint32_t dtb);
 int rock_read(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 int rock_write(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 int rock_read_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);

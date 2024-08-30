@@ -417,7 +417,7 @@ int rock_reset(struct xrock_ctx_t * ctx, int maskrom)
 	return 1;
 }
 
-int rock_exec(struct xrock_ctx_t * ctx, uint32_t addr)
+int rock_exec(struct xrock_ctx_t * ctx, uint32_t addr, uint32_t dtb)
 {
 	struct usb_request_t req;
 	struct usb_response_t res;
@@ -431,7 +431,7 @@ int rock_exec(struct xrock_ctx_t * ctx, uint32_t addr)
 	req.cmd.opcode = OPCODE_EXEC_SDRAM;
 	req.cmd.subcode = 0xaa;
 	write_be32(&req.cmd.address[0], (uint32_t)addr);
-	write_be32(&req.cmd.size[0], (uint32_t)0);
+	write_be32(&req.cmd.size[0], (uint32_t)dtb);
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));

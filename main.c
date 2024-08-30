@@ -25,7 +25,7 @@ static void usage(void)
 	printf("    xrock dump <address> <length>             - Binary memory dump to stdout\r\n");
 	printf("    xrock read <address> <length> <file>      - Read memory to file\r\n");
 	printf("    xrock write <address> <file>              - Write file to memory\r\n");
-	printf("    xrock exec <address>                      - Call function address\r\n");
+	printf("    xrock exec <address> [dtb]                - Call function address\r\n");
 	printf("    xrock flash                               - Detect flash and show information\r\n");
 	printf("    xrock flash erase <sector> <count>        - Erase flash sector\r\n");
 	printf("    xrock flash read <sector> <count> <file>  - Read flash sector to file\r\n");
@@ -215,10 +215,11 @@ int main(int argc, char * argv[])
 	{
 		argc -= 2;
 		argv += 2;
-		if(argc == 1)
+		if(argc >= 1)
 		{
 			uint32_t addr = strtoul(argv[0], NULL, 0);
-			rock_exec(&ctx, addr);
+			uint32_t dtb = (argc >= 2) ? strtoul(argv[1], NULL, 0) : 0;
+			rock_exec(&ctx, addr, dtb);
 		}
 		else
 			usage();
