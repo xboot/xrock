@@ -236,10 +236,13 @@ enum {
 struct usb_command_t {
 	uint8_t opcode;				/* Opcode */
 	uint8_t subcode;			/* Subcode */
-	uint32_t address;			/* Address */
-	uint8_t reserved2;
-	uint16_t size;
-	uint8_t reserved3[7];
+	uint8_t address[4];			/* Address */
+	uint8_t reserved6;
+	uint8_t size[2];			/* Size */
+	uint8_t reserved9;
+	uint8_t reserved10;
+	uint8_t reserved11;
+	uint8_t reserved12[4];
 } __attribute__((packed));
 
 struct usb_request_t {
@@ -427,7 +430,8 @@ int rock_exec(struct xrock_ctx_t * ctx, uint32_t addr)
 	req.cmdlen = 10;
 	req.cmd.opcode = OPCODE_EXEC_SDRAM;
 	req.cmd.subcode = 0xaa;
-	req.cmd.address = cpu_to_be32(addr);
+	write_be32(&req.cmd.address[0], (uint32_t)addr);
+	write_be32(&req.cmd.size[0], (uint32_t)0);
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
@@ -448,8 +452,8 @@ static inline int rock_read_raw(struct xrock_ctx_t * ctx, uint32_t addr, void * 
 	req.flag = USB_DIRECTION_IN;
 	req.cmdlen = 10;
 	req.cmd.opcode = OPCODE_READ_SDRAM;
-	req.cmd.address = cpu_to_be32(addr);
-	req.cmd.size = cpu_to_be16(len);
+	write_be32(&req.cmd.address[0], addr);
+	write_be16(&req.cmd.size[0], (uint16_t)len);
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, buf, len);
@@ -471,8 +475,8 @@ static inline int rock_write_raw(struct xrock_ctx_t * ctx, uint32_t addr, void *
 	req.flag = USB_DIRECTION_OUT;
 	req.cmdlen = 10;
 	req.cmd.opcode = OPCODE_WRITE_SDRAM;
-	req.cmd.address = cpu_to_be32(addr);
-	req.cmd.size = cpu_to_be16(len);
+	write_be32(&req.cmd.address[0], addr);
+	write_be16(&req.cmd.size[0], (uint16_t)len);
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_send(ctx->hdl, ctx->epout, buf, len);
@@ -598,8 +602,8 @@ static inline int rock_flash_erase_lba_raw(struct xrock_ctx_t * ctx, uint32_t se
 	req.flag = USB_DIRECTION_OUT;
 	req.cmdlen = 10;
 	req.cmd.opcode = OPCODE_ERASE_LBA;
-	req.cmd.address = cpu_to_be32(sec);
-	req.cmd.size = cpu_to_be16((uint16_t)cnt);
+	write_be32(&req.cmd.address[0], sec);
+	write_be16(&req.cmd.size[0], (uint16_t)cnt);
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
@@ -621,8 +625,8 @@ static inline int rock_flash_read_lba_raw(struct xrock_ctx_t * ctx, uint32_t sec
 	req.cmdlen = 10;
 	req.cmd.opcode = OPCODE_READ_LBA;
 	req.cmd.subcode = 0;
-	req.cmd.address = cpu_to_be32(sec);
-	req.cmd.size = cpu_to_be16((uint16_t)cnt);
+	write_be32(&req.cmd.address[0], sec);
+	write_be16(&req.cmd.size[0], (uint16_t)cnt);
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_recv(ctx->hdl, ctx->epin, buf, cnt << 9);
@@ -645,8 +649,8 @@ static inline int rock_flash_write_lba_raw(struct xrock_ctx_t * ctx, uint32_t se
 	req.cmdlen = 10;
 	req.cmd.opcode = OPCODE_WRITE_LBA;
 	req.cmd.subcode = 0;
-	req.cmd.address = cpu_to_be32(sec);
-	req.cmd.size = cpu_to_be16((uint16_t)cnt);
+	write_be32(&req.cmd.address[0], sec);
+	write_be16(&req.cmd.size[0], (uint16_t)cnt);
 
 	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
 	usb_bulk_send(ctx->hdl, ctx->epout, buf, cnt << 9);
