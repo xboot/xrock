@@ -83,50 +83,73 @@ int main(int argc, char * argv[])
 	}
 	else if(!strcmp(argv[1], "ready"))
 	{
-		if(rock_ready(&ctx))
-			printf("The chip is ready\r\n");
+		argc -= 2;
+		argv += 2;
+		if(argc == 0)
+		{
+			if(rock_ready(&ctx))
+				printf("The chip is ready\r\n");
+			else
+				printf("Failed to show chip ready status\r\n");
+		}
 		else
-			printf("Failed to show chip ready status\r\n");
+			usage();
 	}
 	else if(!strcmp(argv[1], "version"))
 	{
-		uint8_t buf[16];
-		if(rock_version(&ctx, buf))
-			printf("%s(%c%c%c%c): 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x\r\n", ctx.chip->name,
-				buf[ 3], buf[ 2], buf[ 1], buf[ 0],
-				buf[ 3], buf[ 2], buf[ 1], buf[ 0],
-				buf[ 7], buf[ 6], buf[ 5], buf[ 4],
-				buf[11], buf[10], buf[ 9], buf[ 8],
-				buf[15], buf[14], buf[13], buf[12]);
+		argc -= 2;
+		argv += 2;
+		if(argc == 0)
+		{
+			uint8_t buf[16];
+			if(rock_version(&ctx, buf))
+				printf("%s(%c%c%c%c): 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x 0x%02x%02x%02x%02x\r\n", ctx.chip->name,
+					buf[ 3], buf[ 2], buf[ 1], buf[ 0],
+					buf[ 3], buf[ 2], buf[ 1], buf[ 0],
+					buf[ 7], buf[ 6], buf[ 5], buf[ 4],
+					buf[11], buf[10], buf[ 9], buf[ 8],
+					buf[15], buf[14], buf[13], buf[12]);
+			else
+				printf("Failed to get chip version\r\n");
+		}
 		else
-			printf("Failed to get chip version\r\n");
+			usage();
 	}
 	else if(!strcmp(argv[1], "capability"))
 	{
-		uint8_t buf[8];
-		if(rock_capability(&ctx, buf))
+		argc -= 2;
+		argv += 2;
+		if(argc == 0)
 		{
-			printf("Capability: %02x %02x %02x %02x %02x %02x %02x %02x\r\n",
-				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]);
-			printf("    Direct LBA: %s\r\n", (buf[0] & (1 << 0)) ? "enabled" : "disabled");
-			printf("    Vendor Storage: %s\r\n", (buf[0] & (1 << 1)) ? "enabled" : "disabled");
-			printf("    First 4M Access: %s\r\n", (buf[0] & (1 << 2)) ? "enabled" : "disabled");
-			printf("    Read LBA: %s\r\n", (buf[0] & (1 << 3)) ? "enabled" : "disabled");
-			printf("    Read Com Log: %s\r\n", (buf[0] & (1 << 5)) ? "enabled" : "disabled");
-			printf("    Read IDB Config: %s\r\n", (buf[0] & (1 << 6)) ? "enabled" : "disabled");
-			printf("    Read Secure Mode: %s\r\n", (buf[0] & (1 << 7)) ? "enabled" : "disabled");
-			printf("    New IDB: %s\r\n", (buf[1] & (1 << 0)) ? "enabled" : "disabled");
-			printf("    Switch Storage: %s\r\n", (buf[1] & (1 << 1)) ? "enabled" : "disabled");
-			printf("    LBA Parity: %s\r\n", (buf[1] & (1 << 2)) ? "enabled" : "disabled");
-			printf("    Read OTP Chip: %s\r\n", (buf[1] & (1 << 3)) ? "enabled" : "disabled");
-			printf("    Switch USB3: %s\r\n", (buf[1] & (1 << 4)) ? "enabled" : "disabled");
+			uint8_t buf[8];
+			if(rock_capability(&ctx, buf))
+			{
+				printf("Capability: %02x %02x %02x %02x %02x %02x %02x %02x\r\n",
+					buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]);
+				printf("    Direct LBA: %s\r\n", (buf[0] & (1 << 0)) ? "enabled" : "disabled");
+				printf("    Vendor Storage: %s\r\n", (buf[0] & (1 << 1)) ? "enabled" : "disabled");
+				printf("    First 4M Access: %s\r\n", (buf[0] & (1 << 2)) ? "enabled" : "disabled");
+				printf("    Read LBA: %s\r\n", (buf[0] & (1 << 3)) ? "enabled" : "disabled");
+				printf("    Read Com Log: %s\r\n", (buf[0] & (1 << 5)) ? "enabled" : "disabled");
+				printf("    Read IDB Config: %s\r\n", (buf[0] & (1 << 6)) ? "enabled" : "disabled");
+				printf("    Read Secure Mode: %s\r\n", (buf[0] & (1 << 7)) ? "enabled" : "disabled");
+				printf("    New IDB: %s\r\n", (buf[1] & (1 << 0)) ? "enabled" : "disabled");
+				printf("    Switch Storage: %s\r\n", (buf[1] & (1 << 1)) ? "enabled" : "disabled");
+				printf("    LBA Parity: %s\r\n", (buf[1] & (1 << 2)) ? "enabled" : "disabled");
+				printf("    Read OTP Chip: %s\r\n", (buf[1] & (1 << 3)) ? "enabled" : "disabled");
+				printf("    Switch USB3: %s\r\n", (buf[1] & (1 << 4)) ? "enabled" : "disabled");
+			}
+			else
+				printf("Failed to show capability information\r\n");
 		}
 		else
-			printf("Failed to show capability information\r\n");
+			usage();
 	}
 	else if(!strcmp(argv[1], "reset"))
 	{
-		if(argc > 2)
+		argc -= 2;
+		argv += 2;
+		if(argc > 0)
 		{
 			if(!strcmp(argv[2], "maskrom"))
 				rock_reset(&ctx, 1);
