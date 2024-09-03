@@ -15,6 +15,7 @@ static const char * manufacturer[] = {
 static void usage(void)
 {
 	printf("xrock(v1.0.6) - https://github.com/xboot/xrock\r\n");
+
 	printf("usage:\r\n");
 	printf("    xrock maskrom <ddr> <usbplug> [--rc4-off] - Initial chip using ddr and usbplug in maskrom mode\r\n");
 	printf("    xrock ready                               - Show chip ready or not\r\n");
@@ -30,6 +31,9 @@ static void usage(void)
 	printf("    xrock flash erase <sector> <count>        - Erase flash sector\r\n");
 	printf("    xrock flash read <sector> <count> <file>  - Read flash sector to file\r\n");
 	printf("    xrock flash write <sector> <file>         - Write file to flash sector\r\n");
+
+	printf("extra:\r\n");
+	printf("    xrock extra maskrom --rc4 <on|off> [--sram <file> --delay <ms>] [--dram <file> --delay <ms>] [...]\r\n");
 }
 
 int main(int argc, char * argv[])
@@ -71,9 +75,9 @@ int main(int argc, char * argv[])
 				if((argc == 3) && !strcmp(argv[2], "--rc4-off"))
 					rc4 = 0;
 				rock_maskrom_upload(&ctx, 0x471, argv[0], rc4);
-				usleep(1000);
+				usleep(10 * 1000);
 				rock_maskrom_upload(&ctx, 0x472, argv[1], rc4);
-				usleep(1000);
+				usleep(10 * 1000);
 			}
 			else
 				printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
@@ -375,6 +379,64 @@ int main(int argc, char * argv[])
 			else
 				usage();
 		}
+	}
+	else if(!strcmp(argv[1], "extra"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(!strcmp(argv[0], "maskrom"))
+		{
+			argc -= 1;
+			argv += 1;
+			if(argc >= 2)
+			{
+				if(ctx.maskrom)
+				{
+					int rc4 = 1;
+					for(int i = 0; i < argc; i++)
+					{
+						if(!strcmp(argv[i], "--rc4") && (argc > i + 1))
+						{
+							if(!strcmp(argv[i + 1], "on"))
+								rc4 = 1;
+							else if(!strcmp(argv[i + 1], "off"))
+								rc4 = 0;
+							i++;
+						}
+						else if(!strcmp(argv[i], "--sram") && (argc > i + 1))
+						{
+							rock_maskrom_upload(&ctx, 0x471, argv[i + 1], rc4);
+							i++;
+						}
+						else if(!strcmp(argv[i], "--dram") && (argc > i + 1))
+						{
+							rock_maskrom_upload(&ctx, 0x472, argv[i + 1], rc4);
+							i++;
+						}
+						else if(!strcmp(argv[i], "--delay") && (argc > i + 1))
+						{
+							uint32_t delay = strtoul(argv[i + 1], NULL, 0) * 1000;
+							usleep(delay);
+							i++;
+						}
+						else if(*argv[i] == '-')
+						{
+							usage();
+						}
+						else if(*argv[i] != '-' && strcmp(argv[i], "-") != 0)
+						{
+							usage();
+						}
+					}
+				}
+				else
+					printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
+			}
+			else
+				usage();
+		}
+		else
+			usage();
 	}
 	else
 		usage();
