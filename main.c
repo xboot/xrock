@@ -18,6 +18,7 @@ static void usage(void)
 
 	printf("usage:\r\n");
 	printf("    xrock maskrom <ddr> <usbplug> [--rc4-off] - Initial chip using ddr and usbplug in maskrom mode\r\n");
+	printf("    xrock download <loader>                   - Initial chip using loader in maskrom mode\r\n");
 	printf("    xrock ready                               - Show chip ready or not\r\n");
 	printf("    xrock version                             - Show chip version\r\n");
 	printf("    xrock capability                          - Show capability information\r\n");
@@ -63,7 +64,54 @@ int main(int argc, char * argv[])
 		libusb_exit(ctx.context);
 		return -1;
 	}
-	if(!strcmp(argv[1], "maskrom"))
+	if(!strcmp(argv[1], "download"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 1)
+		{
+			if(ctx.maskrom)
+			{
+				struct rkboot_ctx_t * bctx = rkboot_ctx_alloc(argv[0]);
+				if(bctx)
+				{
+					for(int i = 0; i < bctx->nentry; i++)
+					{
+						struct rkboot_entry_t * e = bctx->entry[i];
+						char str[256];
+						if(e->type == RKBOOT_ENTRY_471)
+						{
+							void * buf = (char *)bctx->buffer + e->data_offset;
+							uint64_t len = e->data_size;
+							uint32_t delay = e->data_delay;
+
+							printf("Downloading '%s'\r\n", wide2str(str, (uint8_t *)&e->name[0], sizeof(e->name)));
+							rock_maskrom_upload_memory(&ctx, 0x471, buf, len, bctx->header->rc4_flag ? 0 : 1);
+							usleep(delay * 1000);
+						}
+						else if(e->type == RKBOOT_ENTRY_472)
+						{
+							void * buf = (char *)bctx->buffer + e->data_offset;
+							uint64_t len = e->data_size;
+							uint32_t delay = e->data_delay;
+
+							printf("Downloading '%s'\r\n", wide2str(str, (uint8_t *)&e->name[0], sizeof(e->name)));
+							rock_maskrom_upload_memory(&ctx, 0x472, buf, len, bctx->header->rc4_flag ? 0 : 1);
+							usleep(delay * 1000);
+						}
+					}
+					rkboot_ctx_free(bctx);
+				}
+				else
+					printf("ERROR: Can't alloc rkboot context\r\n");
+			}
+			else
+				printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
+		}
+		else
+			usage();
+	}
+	else if(!strcmp(argv[1], "maskrom"))
 	{
 		argc -= 2;
 		argv += 2;
@@ -74,9 +122,9 @@ int main(int argc, char * argv[])
 				int rc4 = 1;
 				if((argc == 3) && !strcmp(argv[2], "--rc4-off"))
 					rc4 = 0;
-				rock_maskrom_upload(&ctx, 0x471, argv[0], rc4);
+				rock_maskrom_upload_file(&ctx, 0x471, argv[0], rc4);
 				usleep(10 * 1000);
-				rock_maskrom_upload(&ctx, 0x472, argv[1], rc4);
+				rock_maskrom_upload_file(&ctx, 0x472, argv[1], rc4);
 				usleep(10 * 1000);
 			}
 			else
@@ -405,12 +453,12 @@ int main(int argc, char * argv[])
 						}
 						else if(!strcmp(argv[i], "--sram") && (argc > i + 1))
 						{
-							rock_maskrom_upload(&ctx, 0x471, argv[i + 1], rc4);
+							rock_maskrom_upload_file(&ctx, 0x471, argv[i + 1], rc4);
 							i++;
 						}
 						else if(!strcmp(argv[i], "--dram") && (argc > i + 1))
 						{
-							rock_maskrom_upload(&ctx, 0x472, argv[i + 1], rc4);
+							rock_maskrom_upload_file(&ctx, 0x472, argv[i + 1], rc4);
 							i++;
 						}
 						else if(!strcmp(argv[i], "--delay") && (argc > i + 1))

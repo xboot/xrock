@@ -10,6 +10,7 @@ extern "C" {
 #include <crc16.h>
 #include <crc32.h>
 #include <misc.h>
+#include <rkboot.h>
 #include <progress.h>
 
 struct chip_t {
@@ -38,7 +39,8 @@ struct flash_info_t {
 };
 
 int xrock_init(struct xrock_ctx_t * ctx);
-void rock_maskrom_upload(struct xrock_ctx_t * ctx, uint32_t code, const char * filename, int rc4);
+void rock_maskrom_upload_memory(struct xrock_ctx_t * ctx, uint32_t code, void * buf, uint64_t len, int rc4);
+void rock_maskrom_upload_file(struct xrock_ctx_t * ctx, uint32_t code, const char * filename, int rc4);
 int rock_ready(struct xrock_ctx_t * ctx);
 int rock_version(struct xrock_ctx_t * ctx, uint8_t * buf);
 int rock_capability(struct xrock_ctx_t * ctx, uint8_t * buf);

@@ -57,6 +57,7 @@ For 32-bits windows, you can using `i686-w64-mingw32-` instead of `x86_64-w64-mi
 ```shell
 usage:
     xrock maskrom <ddr> <usbplug> [--rc4-off] - Initial chip using ddr and usbplug in maskrom mode
+    xrock download <loader>                   - Initial chip using loader in maskrom mode
     xrock ready                               - Show chip ready or not
     xrock version                             - Show chip version
     xrock capability                          - Show capability information
@@ -70,6 +71,8 @@ usage:
     xrock flash erase <sector> <count>        - Erase flash sector
     xrock flash read <sector> <count> <file>  - Read flash sector to file
     xrock flash write <sector> <file>         - Write file to flash sector
+extra:
+    xrock extra maskrom --rc4 <on|off> [--sram <file> --delay <ms>] [--dram <file> --delay <ms>] [...]
 ```
 
 ## Tips

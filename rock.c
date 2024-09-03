@@ -121,13 +121,20 @@ int xrock_init(struct xrock_ctx_t * ctx)
 	return 0;
 }
 
-static int rock_maskrom_upload_memory(struct xrock_ctx_t * ctx, uint32_t code, void * buf, uint64_t len)
+void rock_maskrom_upload_memory(struct xrock_ctx_t * ctx, uint32_t code, void * buf, uint64_t len, int rc4)
 {
+	struct rc4_ctx_t rctx;
+	uint8_t key[16] = { 124, 78, 3, 4, 85, 5, 9, 7, 45, 44, 123, 56, 23, 13, 23, 17 };
 	uint64_t total = 0;
 	uint16_t crc16 = 0xffff;
 	int pend = 0;
 	unsigned char * buffer;
 
+	if(rc4)
+	{
+		rc4_setkey(&rctx, key, sizeof(key));
+		rc4_crypt(&rctx, buf, len);
+	}
 	buffer = malloc(len + 5);
 	if(buffer)
 	{
@@ -155,7 +162,7 @@ static int rock_maskrom_upload_memory(struct xrock_ctx_t * ctx, uint32_t code, v
 			if(libusb_control_transfer(ctx->hdl, LIBUSB_REQUEST_TYPE_VENDOR, 0xc, 0, code, buffer + total, n, 0) != n)
 			{
 				free(buffer);
-				return 0;
+				return;
 			}
 			total += n;
 		}
@@ -165,27 +172,18 @@ static int rock_maskrom_upload_memory(struct xrock_ctx_t * ctx, uint32_t code, v
 			libusb_control_transfer(ctx->hdl, LIBUSB_REQUEST_TYPE_VENDOR, 0xc, 0, code, &zero, 1, 0);
 		}
 		free(buffer);
-		return 1;
 	}
-	return 0;
 }
 
-void rock_maskrom_upload(struct xrock_ctx_t * ctx, uint32_t code, const char * filename, int rc4)
+void rock_maskrom_upload_file(struct xrock_ctx_t * ctx, uint32_t code, const char * filename, int rc4)
 {
-	struct rc4_ctx_t rctx;
-	uint8_t key[16] = { 124, 78, 3, 4, 85, 5, 9, 7, 45, 44, 123, 56, 23, 13, 23, 17 };
 	uint64_t len;
 	void * buf;
 
 	buf = file_load(filename, &len);
 	if(buf)
 	{
-		if(rc4)
-		{
-			rc4_setkey(&rctx, key, sizeof(key));
-			rc4_crypt(&rctx, buf, len);
-		}
-		rock_maskrom_upload_memory(ctx, code, buf, len);
+		rock_maskrom_upload_memory(ctx, code, buf, len, rc4);
 		free(buf);
 	}
 }
