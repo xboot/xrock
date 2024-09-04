@@ -531,6 +531,44 @@ int rock_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, siz
 	return 1;
 }
 
+int rock_sn_read(struct xrock_ctx_t * ctx, char * sn)
+{
+	if(sn)
+	{
+		char buf[512];
+		if(rock_flash_read_lba(ctx, 0xfff00001, 1, buf))
+		{
+			uint32_t valid = read_le32(&buf[0]);
+			uint32_t len = read_le32(&buf[4]);
+			if((valid == 1) && (len >= 0) && (len <= 512 - 8))
+			{
+				memcpy(sn, &buf[8], len);
+				sn[len] = '\0';
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+int rock_sn_write(struct xrock_ctx_t * ctx, char * sn)
+{
+	if(sn)
+	{
+		int len = strlen(sn);
+		if((len >= 0) && (len <= 512 - 8))
+		{
+			char buf[512];
+			memset(buf, 0, sizeof(buf));
+			write_le32(&buf[0], 1);
+			write_le32(&buf[4], len);
+			memcpy(&buf[8], sn, len);
+			return rock_flash_write_lba(ctx, 0xfff00001, 1, buf);
+		}
+	}
+	return 0;
+}
+
 int rock_flash_detect(struct xrock_ctx_t * ctx, struct flash_info_t * info)
 {
 	struct usb_request_t req;

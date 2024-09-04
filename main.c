@@ -28,6 +28,8 @@ static void usage(void)
 	printf("    xrock read <address> <length> <file>      - Read memory to file\r\n");
 	printf("    xrock write <address> <file>              - Write file to memory\r\n");
 	printf("    xrock exec <address> [dtb]                - Call function address\r\n");
+	printf("    xrock sn                                  - Read serial number\r\n");
+	printf("    xrock sn <string>                         - Write serial number\r\n");
 	printf("    xrock flash                               - Detect flash and show information\r\n");
 	printf("    xrock flash erase <sector> <count>        - Erase flash sector\r\n");
 	printf("    xrock flash read <sector> <count> <file>  - Read flash sector to file\r\n");
@@ -298,6 +300,31 @@ int main(int argc, char * argv[])
 		}
 		else
 			usage();
+	}
+	else if(!strcmp(argv[1], "sn"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 0)
+		{
+			char sn[512 - 8 + 1];
+			if(rock_sn_read(&ctx, sn))
+				printf("SN: %s\r\n", sn);
+			else
+				printf("No serial number\r\n");
+		}
+		else
+		{
+			if(argc == 1)
+			{
+				if(rock_sn_write(&ctx, argv[0]))
+					printf("Write serial number '%s'\r\n", argv[0]);
+				else
+					printf("Failed to write serial number\r\n");
+			}
+			else
+				usage();
+		}
 	}
 	else if(!strcmp(argv[1], "flash"))
 	{
