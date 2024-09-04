@@ -103,21 +103,21 @@ int main(int argc, char * argv[])
 						char str[256];
 						if(e->type == RKLOADER_ENTRY_471)
 						{
-							void * buf = (char *)bctx->buffer + e->data_offset;
-							uint64_t len = e->data_size;
-							uint32_t delay = e->data_delay;
+							void * buf = (char *)bctx->buffer + rkloader_read_le32(&e->data_offset);
+							uint64_t len = rkloader_read_le32(&e->data_size);
+							uint32_t delay = rkloader_read_le32(&e->data_delay);
 
-							printf("Downloading '%s'\r\n", wide2str(str, (uint8_t *)&e->name[0], sizeof(e->name)));
+							printf("Downloading '%s'\r\n", loader_wide2str(str, (uint8_t *)&e->name[0], sizeof(e->name)));
 							rock_maskrom_upload_memory(&ctx, 0x471, buf, len, bctx->header->rc4_flag ? 0 : 1);
 							usleep(delay * 1000);
 						}
 						else if(e->type == RKLOADER_ENTRY_472)
 						{
-							void * buf = (char *)bctx->buffer + e->data_offset;
-							uint64_t len = e->data_size;
-							uint32_t delay = e->data_delay;
+							void * buf = (char *)bctx->buffer + rkloader_read_le32(&e->data_offset);
+							uint64_t len = rkloader_read_le32(&e->data_size);
+							uint32_t delay = rkloader_read_le32(&e->data_delay);
 
-							printf("Downloading '%s'\r\n", wide2str(str, (uint8_t *)&e->name[0], sizeof(e->name)));
+							printf("Downloading '%s'\r\n", loader_wide2str(str, (uint8_t *)&e->name[0], sizeof(e->name)));
 							rock_maskrom_upload_memory(&ctx, 0x472, buf, len, bctx->header->rc4_flag ? 0 : 1);
 							usleep(delay * 1000);
 						}

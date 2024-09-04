@@ -44,7 +44,14 @@ void rkloader_ctx_free(struct rkloader_ctx_t * ctx)
 	}
 }
 
-char * wide2str(char * str, uint8_t * wide, int len)
+uint32_t rkloader_read_le32(void * addr)
+{
+	uint8_t * p = (uint8_t *)addr;
+
+	return (uint32_t)((p[3] << 24) | (p[2] << 16) | (p[1] << 8) | (p[0] << 0));
+}
+
+char * loader_wide2str(char * str, uint8_t * wide, int len)
 {
 	int i;
 
