@@ -13,6 +13,20 @@ extern "C" {
 #include <loader.h>
 #include <progress.h>
 
+enum storage_type_t {
+	STORAGE_TYPE_UNKNOWN	= (0 << 0),
+	STORAGE_TYPE_FLASH		= (1 << 0),
+	STORAGE_TYPE_EMMC		= (1 << 1),
+	STORAGE_TYPE_SD			= (1 << 2),
+	STORAGE_TYPE_SD1		= (1 << 3),
+	STORAGE_TYPE_SPINOR		= (1 << 9),
+	STORAGE_TYPE_SPINAND	= (1 << 8),
+	STORAGE_TYPE_RAM		= (1 << 6),
+	STORAGE_TYPE_USB		= (1 << 7),
+	STORAGE_TYPE_SATA		= (1 << 10),
+	STORAGE_TYPE_PCIE		= (1 << 11),
+};
+
 struct chip_t {
 	uint16_t pid;
 	char * name;
@@ -52,6 +66,7 @@ int rock_read_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size
 int rock_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 int rock_sn_read(struct xrock_ctx_t * ctx, char * sn);
 int rock_sn_write(struct xrock_ctx_t * ctx, char * sn);
+enum storage_type_t rock_storage_read(struct xrock_ctx_t * ctx);
 int rock_flash_detect(struct xrock_ctx_t * ctx, struct flash_info_t * info);
 int rock_flash_erase_lba(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt);
 int rock_flash_read_lba(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, void * buf);

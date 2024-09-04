@@ -30,6 +30,7 @@ static void usage(void)
 	printf("    xrock exec <address> [dtb]                - Call function address\r\n");
 	printf("    xrock sn                                  - Read serial number\r\n");
 	printf("    xrock sn <string>                         - Write serial number\r\n");
+	printf("    xrock storage                             - Read storage list\r\n");
 	printf("    xrock flash                               - Detect flash and show information\r\n");
 	printf("    xrock flash erase <sector> <count>        - Erase flash sector\r\n");
 	printf("    xrock flash read <sector> <count> <file>  - Read flash sector to file\r\n");
@@ -325,6 +326,28 @@ int main(int argc, char * argv[])
 			else
 				usage();
 		}
+	}
+	else if(!strcmp(argv[1], "storage"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 0)
+		{
+			enum storage_type_t type = rock_storage_read(&ctx);
+			printf("%s 0.UNKNOWN\r\n", (type == STORAGE_TYPE_UNKNOWN) ? "-->" : "   ");
+			printf("%s 1.FLASH\r\n", (type == STORAGE_TYPE_FLASH) ? "-->" : "   ");
+			printf("%s 2.EMMC\r\n", (type == STORAGE_TYPE_EMMC) ? "-->" : "   ");
+			printf("%s 3.SD\r\n", (type == STORAGE_TYPE_SD) ? "-->" : "   ");
+			printf("%s 4.SD1\r\n", (type == STORAGE_TYPE_SD1) ? "-->" : "   ");
+			printf("%s 5.SPINOR\r\n", (type == STORAGE_TYPE_SPINOR) ? "-->" : "   ");
+			printf("%s 6.SPINAND\r\n", (type == STORAGE_TYPE_SPINAND) ? "-->" : "   ");
+			printf("%s 7.RAM\r\n", (type == STORAGE_TYPE_RAM) ? "-->" : "   ");
+			printf("%s 8.USB\r\n", (type == STORAGE_TYPE_USB) ? "-->" : "   ");
+			printf("%s 9.SATA\r\n", (type == STORAGE_TYPE_SATA) ? "-->" : "   ");
+			printf("%s10.PCIE\r\n", (type == STORAGE_TYPE_PCIE) ? "-->" : "   ");
+		}
+		else
+			usage();
 	}
 	else if(!strcmp(argv[1], "flash"))
 	{

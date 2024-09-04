@@ -569,6 +569,46 @@ int rock_sn_write(struct xrock_ctx_t * ctx, char * sn)
 	return 0;
 }
 
+enum storage_type_t rock_storage_read(struct xrock_ctx_t * ctx)
+{
+	struct usb_request_t req;
+	struct usb_response_t res;
+	uint8_t buf[4];
+
+	memset(&req, 0, sizeof(struct usb_request_t));
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_be32(&req.length[0], 4);
+	req.flag = USB_DIRECTION_IN;
+	req.cmdlen = 6;
+	req.cmd.opcode = OPCODE_READ_STORAGE;
+
+	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
+	usb_bulk_recv(ctx->hdl, ctx->epin, buf, 4);
+	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
+		return STORAGE_TYPE_UNKNOWN;
+	enum storage_type_t type = (enum storage_type_t)read_le32(buf);
+	switch(type)
+	{
+	case STORAGE_TYPE_FLASH:
+	case STORAGE_TYPE_EMMC:
+	case STORAGE_TYPE_SD:
+	case STORAGE_TYPE_SD1:
+	case STORAGE_TYPE_SPINOR:
+	case STORAGE_TYPE_SPINAND:
+	case STORAGE_TYPE_RAM:
+	case STORAGE_TYPE_USB:
+	case STORAGE_TYPE_SATA:
+	case STORAGE_TYPE_PCIE:
+		break;
+	default:
+		type = STORAGE_TYPE_UNKNOWN;
+		break;
+	}
+	return type;
+}
+
 int rock_flash_detect(struct xrock_ctx_t * ctx, struct flash_info_t * info)
 {
 	struct usb_request_t req;
