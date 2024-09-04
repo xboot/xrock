@@ -31,6 +31,7 @@ static void usage(void)
 	printf("    xrock sn                                  - Read serial number\r\n");
 	printf("    xrock sn <string>                         - Write serial number\r\n");
 	printf("    xrock storage                             - Read storage list\r\n");
+	printf("    xrock storage <index>                     - Switch storage and show list\r\n");
 	printf("    xrock flash                               - Detect flash and show information\r\n");
 	printf("    xrock flash erase <sector> <count>        - Erase flash sector\r\n");
 	printf("    xrock flash read <sector> <count> <file>  - Read flash sector to file\r\n");
@@ -347,7 +348,66 @@ int main(int argc, char * argv[])
 			printf("%s10.PCIE\r\n", (type == STORAGE_TYPE_PCIE) ? "-->" : "   ");
 		}
 		else
-			usage();
+		{
+			if(argc == 1)
+			{
+				enum storage_type_t type = STORAGE_TYPE_UNKNOWN;
+				int index = strtol(argv[0], NULL, 0);
+				switch(index)
+				{
+				case 0:
+					type = STORAGE_TYPE_UNKNOWN;
+					break;
+				case 1:
+					type = STORAGE_TYPE_FLASH;
+					break;
+				case 2:
+					type = STORAGE_TYPE_EMMC;
+					break;
+				case 3:
+					type = STORAGE_TYPE_SD;
+					break;
+				case 4:
+					type = STORAGE_TYPE_SD1;
+					break;
+				case 5:
+					type = STORAGE_TYPE_SPINOR;
+					break;
+				case 6:
+					type = STORAGE_TYPE_SPINAND;
+					break;
+				case 7:
+					type = STORAGE_TYPE_RAM;
+					break;
+				case 8:
+					type = STORAGE_TYPE_USB;
+					break;
+				case 9:
+					type = STORAGE_TYPE_SATA;
+					break;
+				case 10:
+					type = STORAGE_TYPE_PCIE;
+					break;
+				default:
+					break;
+				}
+				rock_storage_switch(&ctx, type);
+				type = rock_storage_read(&ctx);
+				printf("%s 0.UNKNOWN\r\n", (type == STORAGE_TYPE_UNKNOWN) ? "-->" : "   ");
+				printf("%s 1.FLASH\r\n", (type == STORAGE_TYPE_FLASH) ? "-->" : "   ");
+				printf("%s 2.EMMC\r\n", (type == STORAGE_TYPE_EMMC) ? "-->" : "   ");
+				printf("%s 3.SD\r\n", (type == STORAGE_TYPE_SD) ? "-->" : "   ");
+				printf("%s 4.SD1\r\n", (type == STORAGE_TYPE_SD1) ? "-->" : "   ");
+				printf("%s 5.SPINOR\r\n", (type == STORAGE_TYPE_SPINOR) ? "-->" : "   ");
+				printf("%s 6.SPINAND\r\n", (type == STORAGE_TYPE_SPINAND) ? "-->" : "   ");
+				printf("%s 7.RAM\r\n", (type == STORAGE_TYPE_RAM) ? "-->" : "   ");
+				printf("%s 8.USB\r\n", (type == STORAGE_TYPE_USB) ? "-->" : "   ");
+				printf("%s 9.SATA\r\n", (type == STORAGE_TYPE_SATA) ? "-->" : "   ");
+				printf("%s10.PCIE\r\n", (type == STORAGE_TYPE_PCIE) ? "-->" : "   ");
+			}
+			else
+				usage();
+		}
 	}
 	else if(!strcmp(argv[1], "flash"))
 	{

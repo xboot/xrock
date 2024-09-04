@@ -609,6 +609,61 @@ enum storage_type_t rock_storage_read(struct xrock_ctx_t * ctx)
 	return type;
 }
 
+int rock_storage_switch(struct xrock_ctx_t * ctx, enum storage_type_t type)
+{
+	struct usb_request_t req;
+	struct usb_response_t res;
+
+	memset(&req, 0, sizeof(struct usb_request_t));
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_be32(&req.length[0], 0);
+	req.flag = USB_DIRECTION_OUT;
+	req.cmdlen = 6;
+	req.cmd.opcode = OPCODE_SWITCH_STORAGE;
+	switch(type)
+	{
+	case STORAGE_TYPE_FLASH:
+		req.cmd.subcode = 0;
+		break;
+	case STORAGE_TYPE_EMMC:
+		req.cmd.subcode = 1;
+		break;
+	case STORAGE_TYPE_SD:
+		req.cmd.subcode = 2;
+		break;
+	case STORAGE_TYPE_SD1:
+		req.cmd.subcode = 3;
+		break;
+	case STORAGE_TYPE_SPINOR:
+		req.cmd.subcode = 9;
+		break;
+	case STORAGE_TYPE_SPINAND:
+		req.cmd.subcode = 8;
+		break;
+	case STORAGE_TYPE_RAM:
+		req.cmd.subcode = 6;
+		break;
+	case STORAGE_TYPE_USB:
+		req.cmd.subcode = 7;
+		break;
+	case STORAGE_TYPE_SATA:
+		req.cmd.subcode = 10;
+		break;
+	case STORAGE_TYPE_PCIE:
+		req.cmd.subcode = 11;
+		break;
+	default:
+		break;
+	}
+
+	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
+	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
+		return 0;
+	return 1;
+}
+
 int rock_flash_detect(struct xrock_ctx_t * ctx, struct flash_info_t * info)
 {
 	struct usb_request_t req;
