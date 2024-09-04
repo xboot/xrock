@@ -772,7 +772,7 @@ int rock_flash_erase_lba(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt)
 
 	while(cnt > 0)
 	{
-		n = cnt > 32768 ? 32768 : cnt;
+		n = cnt > 128 ? 128 : cnt;
 		if(!rock_flash_erase_lba_raw(ctx, sec, n))
 			return 0;
 		sec += n;
@@ -821,7 +821,7 @@ int rock_flash_erase_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32
 	progress_start(&p, (uint64_t)cnt << 9);
 	while(cnt > 0)
 	{
-		n = cnt > 32768 ? 32768 : cnt;
+		n = cnt > 128 ? 128 : cnt;
 		if(!rock_flash_erase_lba_raw(ctx, sec, n))
 			return 0;
 		sec += n;
