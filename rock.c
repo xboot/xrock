@@ -130,16 +130,16 @@ void rock_maskrom_upload_memory(struct xrock_ctx_t * ctx, uint32_t code, void * 
 	int pend = 0;
 	unsigned char * buffer;
 
-	if(rc4)
-	{
-		rc4_setkey(&rctx, key, sizeof(key));
-		rc4_crypt(&rctx, buf, len);
-	}
 	buffer = malloc(len + 5);
 	if(buffer)
 	{
 		memset(buffer, 0, len + 5);
 		memcpy(buffer, buf, len);
+		if(rc4)
+		{
+			rc4_setkey(&rctx, key, sizeof(key));
+			rc4_crypt(&rctx, buffer, len);
+		}
 		switch(len % 4096)
 		{
 		case 4095:
