@@ -64,7 +64,29 @@ int main(int argc, char * argv[])
 		libusb_exit(ctx.context);
 		return -1;
 	}
-	if(!strcmp(argv[1], "download"))
+	if(!strcmp(argv[1], "maskrom"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc >= 2)
+		{
+			if(ctx.maskrom)
+			{
+				int rc4 = 1;
+				if((argc == 3) && !strcmp(argv[2], "--rc4-off"))
+					rc4 = 0;
+				rock_maskrom_upload_file(&ctx, 0x471, argv[0], rc4);
+				usleep(10 * 1000);
+				rock_maskrom_upload_file(&ctx, 0x472, argv[1], rc4);
+				usleep(10 * 1000);
+			}
+			else
+				printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
+		}
+		else
+			usage();
+	}
+	else if(!strcmp(argv[1], "download"))
 	{
 		argc -= 2;
 		argv += 2;
@@ -104,28 +126,6 @@ int main(int argc, char * argv[])
 				}
 				else
 					printf("ERROR: Not a valid loader '%s'\r\n", argv[0]);
-			}
-			else
-				printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
-		}
-		else
-			usage();
-	}
-	else if(!strcmp(argv[1], "maskrom"))
-	{
-		argc -= 2;
-		argv += 2;
-		if(argc >= 2)
-		{
-			if(ctx.maskrom)
-			{
-				int rc4 = 1;
-				if((argc == 3) && !strcmp(argv[2], "--rc4-off"))
-					rc4 = 0;
-				rock_maskrom_upload_file(&ctx, 0x471, argv[0], rc4);
-				usleep(10 * 1000);
-				rock_maskrom_upload_file(&ctx, 0x472, argv[1], rc4);
-				usleep(10 * 1000);
 			}
 			else
 				printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
