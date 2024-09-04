@@ -1,12 +1,5 @@
 #include <loader.h>
 
-uint32_t rkloader_read_le32(void * addr)
-{
-	uint8_t * p = (uint8_t *)addr;
-
-	return (uint32_t)((p[3] << 24) | (p[2] << 16) | (p[1] << 8) | (p[0] << 0));
-}
-
 char * loader_wide2str(char * str, uint8_t * wide, int len)
 {
 	int i;
@@ -62,7 +55,7 @@ struct rkloader_ctx_t * rkloader_ctx_alloc(const char * filename)
 	}
 
 	struct rkloader_entry_t * e = ctx->entry[ctx->nentry - 1];
-	uint32_t len = rkloader_read_le32(&e->data_offset) + rkloader_read_le32(&e->data_size);
+	uint32_t len = read_le32(&e->data_offset) + read_le32(&e->data_size);
 	if(ctx->length != len + 4)
 	{
 		if(ctx->buffer)
@@ -73,7 +66,7 @@ struct rkloader_ctx_t * rkloader_ctx_alloc(const char * filename)
 	}
 
 	uint32_t crc32 = 0x0;
-	if(crc32_sum(crc32, (const uint8_t *)ctx->buffer, len) != rkloader_read_le32((char *)ctx->buffer + len))
+	if(crc32_sum(crc32, (const uint8_t *)ctx->buffer, len) != read_le32((char *)ctx->buffer + len))
 	{
 		if(ctx->buffer)
 			free(ctx->buffer);

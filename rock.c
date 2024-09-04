@@ -297,31 +297,6 @@ static inline void usb_bulk_recv(libusb_device_handle * hdl, int ep, void * buf,
 	}
 }
 
-static void write_be16(void * addr, uint16_t val)
-{
-	uint8_t * p = (uint8_t *)addr;
-
-	p[1] = (val >> 0) & 0xff;
-	p[0] = (val >> 8) & 0xff;
-}
-
-static void write_be32(void * addr, uint32_t val)
-{
-	uint8_t * p = (uint8_t *)addr;
-
-	p[3] = (val >> 0) & 0xff;
-	p[2] = (val >> 8) & 0xff;
-	p[1] = (val >> 16) & 0xff;
-	p[0] = (val >> 24) & 0xff;
-}
-
-static uint32_t read_be32(void * addr)
-{
-	uint8_t * p = (uint8_t *)addr;
-
-	return (uint32_t)((p[0] << 24) | (p[1] << 16) | (p[2] << 8) | (p[3] << 0));
-}
-
 static inline uint32_t make_tag(void)
 {
 	uint32_t tag = 0;

@@ -93,6 +93,62 @@ static inline uint32_t __swahb32(uint32_t x)
 #define be16_to_cpu(x)	(__swab16((uint16_t)(x)))
 #endif
 
+static inline uint16_t read_le16(void * addr)
+{
+	uint8_t * p = (uint8_t *)addr;
+	return (uint16_t)((p[1] << 8) | (p[0] << 0));
+}
+
+static inline uint16_t read_be16(void * addr)
+{
+	uint8_t * p = (uint8_t *)addr;
+	return (uint16_t)((p[0] << 8) | (p[1] << 0));
+}
+
+static inline uint32_t read_le32(void * addr)
+{
+	uint8_t * p = (uint8_t *)addr;
+	return (uint32_t)((p[3] << 24) | (p[2] << 16) | (p[1] << 8) | (p[0] << 0));
+}
+
+static inline uint32_t read_be32(void * addr)
+{
+	uint8_t * p = (uint8_t *)addr;
+	return (uint32_t)((p[0] << 24) | (p[1] << 16) | (p[2] << 8) | (p[3] << 0));
+}
+
+static inline void write_le16(void * addr, uint16_t val)
+{
+	uint8_t * p = (uint8_t *)addr;
+	p[0] = (val >> 0) & 0xff;
+	p[1] = (val >> 8) & 0xff;
+}
+
+static inline void write_be16(void * addr, uint16_t val)
+{
+	uint8_t * p = (uint8_t *)addr;
+	p[0] = (val >> 8) & 0xff;
+	p[1] = (val >> 0) & 0xff;
+}
+
+static inline void write_le32(void * addr, uint32_t val)
+{
+	uint8_t * p = (uint8_t *)addr;
+	p[0] = (val >> 0) & 0xff;
+	p[1] = (val >> 8) & 0xff;
+	p[2] = (val >> 16) & 0xff;
+	p[3] = (val >> 24) & 0xff;
+}
+
+static inline void write_be32(void * addr, uint32_t val)
+{
+	uint8_t * p = (uint8_t *)addr;
+	p[0] = (val >> 24) & 0xff;
+	p[1] = (val >> 16) & 0xff;
+	p[2] = (val >> 8) & 0xff;
+	p[3] = (val >> 0) & 0xff;
+}
+
 #define ARRAY_SIZE(array)	(sizeof(array) / sizeof((array)[0]))
 #define X(...)				("" #__VA_ARGS__ "")
 
