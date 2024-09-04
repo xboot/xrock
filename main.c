@@ -440,7 +440,7 @@ int main(int argc, char * argv[])
 			{
 				if(ctx.maskrom)
 				{
-					int rc4 = 1;
+					int rc4 = 0;
 					for(int i = 0; i < argc; i++)
 					{
 						if(!strcmp(argv[i], "--rc4") && (argc > i + 1))
