@@ -1,5 +1,5 @@
-#ifndef __RKBOOT_H__
-#define __RKBOOT_H__
+#ifndef __LOADER_H__
+#define __LOADER_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -8,13 +8,13 @@ extern "C" {
 #include <x.h>
 #include <misc.h>
 
-enum rkboot_entry_type_t {
-	RKBOOT_ENTRY_471	= (1 << 0),
-	RKBOOT_ENTRY_472	= (1 << 1),
-	RKBOOT_ENTRY_LOADER	= (1 << 2),
+enum rkloader_entry_type_t {
+	RKLOADER_ENTRY_471		= (1 << 0),
+	RKLOADER_ENTRY_472		= (1 << 1),
+	RKLOADER_ENTRY_LOADER	= (1 << 2),
 };
 
-struct rkboot_time_t {
+struct rkloader_time_t {
 	uint16_t	year;
 	uint8_t		month;
 	uint8_t		day;
@@ -23,12 +23,12 @@ struct rkboot_time_t {
 	uint8_t		second;
 } __attribute__((packed));
 
-struct rkboot_header_t {
+struct rkloader_header_t {
 	uint32_t	tag;
 	uint16_t	size;
 	uint32_t	version;
 	uint32_t	merger_version;
-	struct rkboot_time_t release_time;
+	struct rkloader_time_t release_time;
 	uint32_t	chiptype;
 	uint8_t		code471_num;
 	uint32_t	code471_offset;
@@ -44,7 +44,7 @@ struct rkboot_header_t {
 	uint8_t		reserved[57];
 } __attribute__((packed));
 
-struct rkboot_entry_t {
+struct rkloader_entry_t {
 	uint8_t		size;
 	uint32_t	type;
 	uint16_t	name[20];
@@ -53,20 +53,20 @@ struct rkboot_entry_t {
 	uint32_t	data_delay;
 } __attribute__((packed));
 
-struct rkboot_ctx_t {
+struct rkloader_ctx_t {
 	void * buffer;
 	uint64_t length;
-	struct rkboot_header_t * header;
-	struct rkboot_entry_t * entry[32];
+	struct rkloader_header_t * header;
+	struct rkloader_entry_t * entry[32];
 	int nentry;
 };
 
+struct rkloader_ctx_t * rkloader_ctx_alloc(const char * filename);
+void rkloader_ctx_free(struct rkloader_ctx_t * ctx);
 char * wide2str(char * str, uint8_t * wide, int len);
-struct rkboot_ctx_t * rkboot_ctx_alloc(const char * filename);
-void rkboot_ctx_free(struct rkboot_ctx_t * ctx);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __RKBOOT_H__ */
+#endif /* __LOADER_H__ */

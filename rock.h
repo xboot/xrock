@@ -10,7 +10,7 @@ extern "C" {
 #include <crc16.h>
 #include <crc32.h>
 #include <misc.h>
-#include <rkboot.h>
+#include <loader.h>
 #include <progress.h>
 
 struct chip_t {
