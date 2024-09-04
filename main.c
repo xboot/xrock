@@ -103,7 +103,7 @@ int main(int argc, char * argv[])
 					rkboot_ctx_free(bctx);
 				}
 				else
-					printf("ERROR: Can't alloc rkboot context\r\n");
+					printf("ERROR: Not a valid loader '%s'\r\n", argv[0]);
 			}
 			else
 				printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
@@ -203,7 +203,7 @@ int main(int argc, char * argv[])
 		argv += 2;
 		if(argc > 0)
 		{
-			if(!strcmp(argv[2], "maskrom"))
+			if(!strcmp(argv[0], "maskrom"))
 				rock_reset(&ctx, 1);
 			else
 				usage();
