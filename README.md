@@ -70,8 +70,9 @@ usage:
     xrock otp <length>                        - Dump otp memory in hex
     xrock sn                                  - Read serial number
     xrock sn <string>                         - Write serial number
-    xrock storage                             - Read storage list
-    xrock storage <index>                     - Switch storage and show list
+    xrock vs read <index> <length> [type]     - Read vendor storage
+    xrock storage                             - Read storage media list
+    xrock storage <index>                     - Switch storage media and show list
     xrock flash                               - Detect flash and show information
     xrock flash erase <sector> <count>        - Erase flash sector
     xrock flash read <sector> <count> <file>  - Read flash sector to file

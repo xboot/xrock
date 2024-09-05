@@ -34,8 +34,9 @@ static void usage(void)
 	printf("    xrock otp <length>                        - Dump otp memory in hex\r\n");
 	printf("    xrock sn                                  - Read serial number\r\n");
 	printf("    xrock sn <string>                         - Write serial number\r\n");
-	printf("    xrock storage                             - Read storage list\r\n");
-	printf("    xrock storage <index>                     - Switch storage and show list\r\n");
+	printf("    xrock vs read <index> <length> [type]     - Read vendor storage\r\n");
+	printf("    xrock storage                             - Read storage media list\r\n");
+	printf("    xrock storage <index>                     - Switch storage media and show list\r\n");
 	printf("    xrock flash                               - Detect flash and show information\r\n");
 	printf("    xrock flash erase <sector> <count>        - Erase flash sector\r\n");
 	printf("    xrock flash read <sector> <count> <file>  - Read flash sector to file\r\n");
@@ -360,6 +361,39 @@ int main(int argc, char * argv[])
 				else
 					usage();
 			}
+		}
+		else
+			printf("The loader don't support vendor storage\r\n");
+	}
+	else if(!strcmp(argv[1], "vs"))
+	{
+		if(rock_capability_support(&ctx, CAPABILITY_TYPE_VENDOR_STORAGE) || rock_capability_support(&ctx, CAPABILITY_TYPE_NEW_VENDOR_STORAGE))
+		{
+			argc -= 2;
+			argv += 2;
+			if(argc > 0)
+			{
+				if(!strcmp(argv[0], "read") && (argc >= 3))
+				{
+					int index = strtoul(argv[1], NULL, 0);
+					int len = strtoul(argv[2], NULL, 0);
+					int type = (argc == 4) ? strtoul(argv[3], NULL, 0) : 0;
+					if(len > 0)
+					{
+						uint8_t * buf = malloc(len);
+						if(buf)
+						{
+							if(rock_vs_read(&ctx, type, index, buf, len))
+								hexdump(0, buf, len);
+							free(buf);
+						}
+					}
+				}
+				else
+					usage();
+			}
+			else
+				usage();
 		}
 		else
 			printf("The loader don't support vendor storage\r\n");
