@@ -70,7 +70,6 @@ install:
 	install -Dm0755 xrock /usr/local/bin/xrock
 	install -Dm0644 99-xrock.rules /etc/udev/rules.d/99-xrock.rules
 	install -Dm0644 LICENSE /usr/share/licenses/xrock/LICENSE
-	udevadm control --reload
 
 clean:
 	@$(RM) $(DEPS) $(OBJS) $(NAME).exe $(NAME) *~
