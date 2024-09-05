@@ -15,6 +15,9 @@ static const char * manufacturer[] = {
 static void usage(void)
 {
 	printf("xrock(v1.0.7) - https://github.com/xboot/xrock\r\n");
+	printf("    Copyright(c) Jianjun Jiang <8192542@qq.com>\r\n");
+	printf("    Mobile phone: +86-18665388956\r\n");
+	printf("    QQ: 8192542\r\n");
 
 	printf("usage:\r\n");
 	printf("    xrock maskrom <ddr> <usbplug> [--rc4-off] - Initial chip using ddr and usbplug in maskrom mode\r\n");
@@ -23,11 +26,12 @@ static void usage(void)
 	printf("    xrock version                             - Show chip version\r\n");
 	printf("    xrock capability                          - Show capability information\r\n");
 	printf("    xrock reset [maskrom]                     - Reset chip to normal or maskrom mode\n");
-	printf("    xrock hexdump <address> <length>          - Dumps memory region in hex\r\n");
+	printf("    xrock hexdump <address> <length>          - Dump memory region in hex\r\n");
 	printf("    xrock dump <address> <length>             - Binary memory dump to stdout\r\n");
 	printf("    xrock read <address> <length> <file>      - Read memory to file\r\n");
 	printf("    xrock write <address> <file>              - Write file to memory\r\n");
 	printf("    xrock exec <address> [dtb]                - Call function address\r\n");
+	printf("    xrock otp <length>                        - Dump otp memory in hex\r\n");
 	printf("    xrock sn                                  - Read serial number\r\n");
 	printf("    xrock sn <string>                         - Write serial number\r\n");
 	printf("    xrock storage                             - Read storage list\r\n");
@@ -302,6 +306,29 @@ int main(int argc, char * argv[])
 		}
 		else
 			usage();
+	}
+	else if(!strcmp(argv[1], "otp"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 1)
+		{
+			int len = strtoul(argv[0], NULL, 0);
+			if(len > 0)
+			{
+				uint8_t * otp = malloc(len);
+				if(otp)
+				{
+					if(rock_otp_read(&ctx, otp, len))
+						hexdump(0, otp, len);
+					free(otp);
+				}
+			}
+		}
+		else
+		{
+			usage();
+		}
 	}
 	else if(!strcmp(argv[1], "sn"))
 	{

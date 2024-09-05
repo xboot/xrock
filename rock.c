@@ -537,6 +537,26 @@ int rock_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, siz
 	return 1;
 }
 
+int rock_otp_read(struct xrock_ctx_t * ctx, uint8_t * buf, int len)
+{
+	struct usb_request_t req;
+	struct usb_response_t res;
+
+	memset(&req, 0, sizeof(struct usb_request_t));
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_le32(&req.length[0], len);
+	req.flag = USB_DIRECTION_IN;
+	req.cmdlen = 6;
+	req.cmd.opcode = OPCODE_READ_OTP_CHIP;
+	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
+	usb_bulk_recv(ctx->hdl, ctx->epin, buf, len);
+	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
+		return 0;
+	return 1;
+}
+
 int rock_sn_read(struct xrock_ctx_t * ctx, char * sn)
 {
 	if(sn)

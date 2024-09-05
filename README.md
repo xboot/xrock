@@ -62,11 +62,12 @@ usage:
     xrock version                             - Show chip version
     xrock capability                          - Show capability information
     xrock reset [maskrom]                     - Reset chip to normal or maskrom mode
-    xrock hexdump <address> <length>          - Dumps memory region in hex
+    xrock hexdump <address> <length>          - Dump memory region in hex
     xrock dump <address> <length>             - Binary memory dump to stdout
     xrock read <address> <length> <file>      - Read memory to file
     xrock write <address> <file>              - Write file to memory
     xrock exec <address> [dtb]                - Call function address
+    xrock otp <length>                        - Dump otp memory in hex
     xrock sn                                  - Read serial number
     xrock sn <string>                         - Write serial number
     xrock storage                             - Read storage list

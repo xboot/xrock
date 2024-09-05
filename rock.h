@@ -64,6 +64,7 @@ int rock_read(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 int rock_write(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 int rock_read_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
 int rock_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
+int rock_otp_read(struct xrock_ctx_t * ctx, uint8_t * buf, int len);
 int rock_sn_read(struct xrock_ctx_t * ctx, char * sn);
 int rock_sn_write(struct xrock_ctx_t * ctx, char * sn);
 enum storage_type_t rock_storage_read(struct xrock_ctx_t * ctx);
