@@ -309,51 +309,59 @@ int main(int argc, char * argv[])
 	}
 	else if(!strcmp(argv[1], "otp"))
 	{
-		argc -= 2;
-		argv += 2;
-		if(argc == 1)
+		if(rock_capability_support(&ctx, CAPABILITY_TYPE_READ_OTP_CHIP))
 		{
-			int len = strtoul(argv[0], NULL, 0);
-			if(len > 0)
-			{
-				uint8_t * otp = malloc(len);
-				if(otp)
-				{
-					if(rock_otp_read(&ctx, otp, len))
-						hexdump(0, otp, len);
-					free(otp);
-				}
-			}
-		}
-		else
-		{
-			usage();
-		}
-	}
-	else if(!strcmp(argv[1], "sn"))
-	{
-		argc -= 2;
-		argv += 2;
-		if(argc == 0)
-		{
-			char sn[512 - 8 + 1];
-			if(rock_sn_read(&ctx, sn))
-				printf("SN: %s\r\n", sn);
-			else
-				printf("No serial number\r\n");
-		}
-		else
-		{
+			argc -= 2;
+			argv += 2;
 			if(argc == 1)
 			{
-				if(rock_sn_write(&ctx, argv[0]))
-					printf("Write serial number '%s'\r\n", argv[0]);
-				else
-					printf("Failed to write serial number\r\n");
+				int len = strtoul(argv[0], NULL, 0);
+				if(len > 0)
+				{
+					uint8_t * otp = malloc(len);
+					if(otp)
+					{
+						if(rock_otp_read(&ctx, otp, len))
+							hexdump(0, otp, len);
+						free(otp);
+					}
+				}
 			}
 			else
 				usage();
 		}
+		else
+			printf("The loader don't support dump otp\r\n");
+	}
+	else if(!strcmp(argv[1], "sn"))
+	{
+		if(rock_capability_support(&ctx, CAPABILITY_TYPE_VENDOR_STORAGE))
+		{
+			argc -= 2;
+			argv += 2;
+			if(argc == 0)
+			{
+				char sn[512 - 8 + 1];
+				if(rock_sn_read(&ctx, sn))
+					printf("SN: %s\r\n", sn);
+				else
+					printf("No serial number\r\n");
+			}
+			else
+			{
+				if(argc == 1)
+				{
+					if(rock_sn_write(&ctx, argv[0]))
+						printf("Write serial number '%s'\r\n", argv[0]);
+					else
+						printf("Failed to write serial number\r\n");
+				}
+				else
+					usage();
+			}
+		}
+		else
+			printf("The loader don't support vendor storage\r\n");
 	}
 	else if(!strcmp(argv[1], "storage"))
 	{
@@ -376,64 +384,69 @@ int main(int argc, char * argv[])
 		}
 		else
 		{
-			if(argc == 1)
+			if(rock_capability_support(&ctx, CAPABILITY_TYPE_SWITCH_STORAGE))
 			{
-				enum storage_type_t type = STORAGE_TYPE_UNKNOWN;
-				int index = strtol(argv[0], NULL, 0);
-				switch(index)
+				if(argc == 1)
 				{
-				case 0:
-					type = STORAGE_TYPE_UNKNOWN;
-					break;
-				case 1:
-					type = STORAGE_TYPE_FLASH;
-					break;
-				case 2:
-					type = STORAGE_TYPE_EMMC;
-					break;
-				case 3:
-					type = STORAGE_TYPE_SD;
-					break;
-				case 4:
-					type = STORAGE_TYPE_SD1;
-					break;
-				case 5:
-					type = STORAGE_TYPE_SPINOR;
-					break;
-				case 6:
-					type = STORAGE_TYPE_SPINAND;
-					break;
-				case 7:
-					type = STORAGE_TYPE_RAM;
-					break;
-				case 8:
-					type = STORAGE_TYPE_USB;
-					break;
-				case 9:
-					type = STORAGE_TYPE_SATA;
-					break;
-				case 10:
-					type = STORAGE_TYPE_PCIE;
-					break;
-				default:
-					break;
+					enum storage_type_t type = STORAGE_TYPE_UNKNOWN;
+					int index = strtol(argv[0], NULL, 0);
+					switch(index)
+					{
+					case 0:
+						type = STORAGE_TYPE_UNKNOWN;
+						break;
+					case 1:
+						type = STORAGE_TYPE_FLASH;
+						break;
+					case 2:
+						type = STORAGE_TYPE_EMMC;
+						break;
+					case 3:
+						type = STORAGE_TYPE_SD;
+						break;
+					case 4:
+						type = STORAGE_TYPE_SD1;
+						break;
+					case 5:
+						type = STORAGE_TYPE_SPINOR;
+						break;
+					case 6:
+						type = STORAGE_TYPE_SPINAND;
+						break;
+					case 7:
+						type = STORAGE_TYPE_RAM;
+						break;
+					case 8:
+						type = STORAGE_TYPE_USB;
+						break;
+					case 9:
+						type = STORAGE_TYPE_SATA;
+						break;
+					case 10:
+						type = STORAGE_TYPE_PCIE;
+						break;
+					default:
+						break;
+					}
+					rock_storage_switch(&ctx, type);
+					type = rock_storage_read(&ctx);
+					printf("%s 0.UNKNOWN\r\n", (type == STORAGE_TYPE_UNKNOWN) ? "-->" : "   ");
+					printf("%s 1.FLASH\r\n", (type == STORAGE_TYPE_FLASH) ? "-->" : "   ");
+					printf("%s 2.EMMC\r\n", (type == STORAGE_TYPE_EMMC) ? "-->" : "   ");
+					printf("%s 3.SD\r\n", (type == STORAGE_TYPE_SD) ? "-->" : "   ");
+					printf("%s 4.SD1\r\n", (type == STORAGE_TYPE_SD1) ? "-->" : "   ");
+					printf("%s 5.SPINOR\r\n", (type == STORAGE_TYPE_SPINOR) ? "-->" : "   ");
+					printf("%s 6.SPINAND\r\n", (type == STORAGE_TYPE_SPINAND) ? "-->" : "   ");
+					printf("%s 7.RAM\r\n", (type == STORAGE_TYPE_RAM) ? "-->" : "   ");
+					printf("%s 8.USB\r\n", (type == STORAGE_TYPE_USB) ? "-->" : "   ");
+					printf("%s 9.SATA\r\n", (type == STORAGE_TYPE_SATA) ? "-->" : "   ");
+					printf("%s10.PCIE\r\n", (type == STORAGE_TYPE_PCIE) ? "-->" : "   ");
 				}
-				rock_storage_switch(&ctx, type);
-				type = rock_storage_read(&ctx);
-				printf("%s 0.UNKNOWN\r\n", (type == STORAGE_TYPE_UNKNOWN) ? "-->" : "   ");
-				printf("%s 1.FLASH\r\n", (type == STORAGE_TYPE_FLASH) ? "-->" : "   ");
-				printf("%s 2.EMMC\r\n", (type == STORAGE_TYPE_EMMC) ? "-->" : "   ");
-				printf("%s 3.SD\r\n", (type == STORAGE_TYPE_SD) ? "-->" : "   ");
-				printf("%s 4.SD1\r\n", (type == STORAGE_TYPE_SD1) ? "-->" : "   ");
-				printf("%s 5.SPINOR\r\n", (type == STORAGE_TYPE_SPINOR) ? "-->" : "   ");
-				printf("%s 6.SPINAND\r\n", (type == STORAGE_TYPE_SPINAND) ? "-->" : "   ");
-				printf("%s 7.RAM\r\n", (type == STORAGE_TYPE_RAM) ? "-->" : "   ");
-				printf("%s 8.USB\r\n", (type == STORAGE_TYPE_USB) ? "-->" : "   ");
-				printf("%s 9.SATA\r\n", (type == STORAGE_TYPE_SATA) ? "-->" : "   ");
-				printf("%s10.PCIE\r\n", (type == STORAGE_TYPE_PCIE) ? "-->" : "   ");
+				else
+					usage();
 			}
 			else
-				usage();
+				printf("The loader don't support switch storage\r\n");
 		}
 	}
 	else if(!strcmp(argv[1], "flash"))
