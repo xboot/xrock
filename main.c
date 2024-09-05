@@ -14,7 +14,7 @@ static const char * manufacturer[] = {
 
 static void usage(void)
 {
-	printf("xrock(v1.0.7) - https://github.com/xboot/xrock\r\n");
+	printf("xrock(v1.0.8) - https://github.com/xboot/xrock\r\n");
 	printf("    Copyright(c) Jianjun Jiang <8192542@qq.com>\r\n");
 	printf("    Mobile phone: +86-18665388956\r\n");
 	printf("    QQ: 8192542\r\n");
