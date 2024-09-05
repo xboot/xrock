@@ -35,6 +35,7 @@ static void usage(void)
 	printf("    xrock sn                                  - Read serial number\r\n");
 	printf("    xrock sn <string>                         - Write serial number\r\n");
 	printf("    xrock vs read <index> <length> [type]     - Read vendor storage\r\n");
+	printf("    xrock vs write <index> <string> [type]    - Write vendor storage\r\n");
 	printf("    xrock storage                             - Read storage media list\r\n");
 	printf("    xrock storage <index>                     - Switch storage media and show list\r\n");
 	printf("    xrock flash                               - Detect flash and show information\r\n");
@@ -385,6 +386,28 @@ int main(int argc, char * argv[])
 						{
 							if(rock_vs_read(&ctx, type, index, buf, len))
 								hexdump(0, buf, len);
+							free(buf);
+						}
+					}
+				}
+				else if(!strcmp(argv[0], "write") && (argc >= 3))
+				{
+					int index = strtoul(argv[1], NULL, 0);
+					int type = (argc == 4) ? strtoul(argv[3], NULL, 0) : 0;
+					int len = strlen(argv[2]);
+					if(len > 0)
+					{
+						uint8_t * buf = malloc(len + 8);
+						if(buf)
+						{
+							memset(buf, 0, sizeof(len + 8));
+							write_le32(&buf[0], 1);
+							write_le32(&buf[4], len);
+							memcpy(&buf[8], argv[2], len);
+							if(rock_vs_write(&ctx, type, index, buf, len + 8))
+								printf("Write vendor storage success\r\n");
+							else
+								printf("Failed to write vendor storage\r\n");
 							free(buf);
 						}
 					}

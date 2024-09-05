@@ -71,6 +71,7 @@ usage:
     xrock sn                                  - Read serial number
     xrock sn <string>                         - Write serial number
     xrock vs read <index> <length> [type]     - Read vendor storage
+    xrock vs write <index> <string> [type]    - Write vendor storage
     xrock storage                             - Read storage media list
     xrock storage <index>                     - Switch storage media and show list
     xrock flash                               - Detect flash and show information
