@@ -18,14 +18,15 @@ enum capability_type_t {
 	CAPABILITY_TYPE_VENDOR_STORAGE		= (1 << 1),
 	CAPABILITY_TYPE_FIRST_4M_ACCESS		= (1 << 2),
 	CAPABILITY_TYPE_READ_LBA			= (1 << 3),
-	CAPABILITY_TYPE_READ_COM_LOG		= (1 << 4),
-	CAPABILITY_TYPE_READ_IDB_CONFIG		= (1 << 5),
-	CAPABILITY_TYPE_READ_SECURE_MODE	= (1 << 6),
-	CAPABILITY_TYPE_NEW_IDB				= (1 << 7),
-	CAPABILITY_TYPE_SWITCH_STORAGE		= (1 << 8),
-	CAPABILITY_TYPE_LBA_PARITY			= (1 << 9),
-	CAPABILITY_TYPE_READ_OTP_CHIP		= (1 << 10),
-	CAPABILITY_TYPE_SWITCH_USB3			= (1 << 11),
+	CAPABILITY_TYPE_NEW_VENDOR_STORAGE	= (1 << 4),
+	CAPABILITY_TYPE_READ_COM_LOG		= (1 << 5),
+	CAPABILITY_TYPE_READ_IDB_CONFIG		= (1 << 6),
+	CAPABILITY_TYPE_READ_SECURE_MODE	= (1 << 7),
+	CAPABILITY_TYPE_NEW_IDB				= (1 << 8),
+	CAPABILITY_TYPE_SWITCH_STORAGE		= (1 << 9),
+	CAPABILITY_TYPE_LBA_PARITY			= (1 << 10),
+	CAPABILITY_TYPE_READ_OTP_CHIP		= (1 << 11),
+	CAPABILITY_TYPE_SWITCH_USB3			= (1 << 12),
 };
 
 enum storage_type_t {
@@ -83,6 +84,7 @@ int rock_write_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, siz
 int rock_otp_read(struct xrock_ctx_t * ctx, uint8_t * buf, int len);
 int rock_sn_read(struct xrock_ctx_t * ctx, char * sn);
 int rock_sn_write(struct xrock_ctx_t * ctx, char * sn);
+int rock_vs_read(struct xrock_ctx_t * ctx, int type, int index, uint8_t * buf, int len);
 enum storage_type_t rock_storage_read(struct xrock_ctx_t * ctx);
 int rock_storage_switch(struct xrock_ctx_t * ctx, enum storage_type_t type);
 int rock_flash_detect(struct xrock_ctx_t * ctx, struct flash_info_t * info);

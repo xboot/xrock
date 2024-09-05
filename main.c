@@ -190,6 +190,7 @@ int main(int argc, char * argv[])
 				printf("    Vendor Storage: %s\r\n", (buf[0] & (1 << 1)) ? "enabled" : "disabled");
 				printf("    First 4M Access: %s\r\n", (buf[0] & (1 << 2)) ? "enabled" : "disabled");
 				printf("    Read LBA: %s\r\n", (buf[0] & (1 << 3)) ? "enabled" : "disabled");
+				printf("    New Vendor Storage: %s\r\n", (buf[0] & (1 << 4)) ? "enabled" : "disabled");
 				printf("    Read Com Log: %s\r\n", (buf[0] & (1 << 5)) ? "enabled" : "disabled");
 				printf("    Read IDB Config: %s\r\n", (buf[0] & (1 << 6)) ? "enabled" : "disabled");
 				printf("    Read Secure Mode: %s\r\n", (buf[0] & (1 << 7)) ? "enabled" : "disabled");
@@ -335,7 +336,7 @@ int main(int argc, char * argv[])
 	}
 	else if(!strcmp(argv[1], "sn"))
 	{
-		if(rock_capability_support(&ctx, CAPABILITY_TYPE_VENDOR_STORAGE))
+		if(rock_capability_support(&ctx, CAPABILITY_TYPE_VENDOR_STORAGE) || rock_capability_support(&ctx, CAPABILITY_TYPE_NEW_VENDOR_STORAGE))
 		{
 			argc -= 2;
 			argv += 2;

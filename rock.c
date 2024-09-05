@@ -393,6 +393,8 @@ int rock_capability_support(struct xrock_ctx_t * ctx, enum capability_type_t typ
 			return (buf[0] & (1 << 2)) ? 1 : 0;
 		case CAPABILITY_TYPE_READ_LBA:
 			return (buf[0] & (1 << 3)) ? 1 : 0;
+		case CAPABILITY_TYPE_NEW_VENDOR_STORAGE:
+			return (buf[0] & (1 << 4)) ? 1 : 0;
 		case CAPABILITY_TYPE_READ_COM_LOG:
 			return (buf[0] & (1 << 5)) ? 1 : 0;
 		case CAPABILITY_TYPE_READ_IDB_CONFIG:
@@ -634,6 +636,31 @@ int rock_sn_write(struct xrock_ctx_t * ctx, char * sn)
 		}
 	}
 	return 0;
+}
+
+int rock_vs_read(struct xrock_ctx_t * ctx, int type, int index, uint8_t * buf, int len)
+{
+	struct usb_request_t req;
+	struct usb_response_t res;
+
+	memset(&req, 0, sizeof(struct usb_request_t));
+	write_be32(&req.signature[0], USB_REQUEST_SIGN);
+	write_be32(&req.tag[0], make_tag());
+	write_le32(&req.length[0], len);
+	req.flag = USB_DIRECTION_IN;
+	req.cmdlen = 10;
+	req.cmd.opcode = OPCODE_READ_VENDOR_STORAGE;
+	req.cmd.subcode = 0;
+	write_be16(&req.cmd.address[0], index);
+	write_be16(&req.cmd.address[2], type);
+	write_be16(&req.cmd.size[0], len);
+
+	usb_bulk_send(ctx->hdl, ctx->epout, &req, sizeof(struct usb_request_t));
+	usb_bulk_recv(ctx->hdl, ctx->epin, buf, len);
+	usb_bulk_recv(ctx->hdl, ctx->epin, &res, sizeof(struct usb_response_t));
+	if((read_be32(&res.signature[0]) != USB_RESPONSE_SIGN) || (memcmp(&res.tag[0], &req.tag[0], 4) != 0))
+		return 0;
+	return 1;
 }
 
 enum storage_type_t rock_storage_read(struct xrock_ctx_t * ctx)
