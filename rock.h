@@ -29,17 +29,17 @@ enum capability_type_t {
 };
 
 enum storage_type_t {
-	STORAGE_TYPE_UNKNOWN	= (0 << 0),
-	STORAGE_TYPE_FLASH		= (1 << 0),
-	STORAGE_TYPE_EMMC		= (1 << 1),
-	STORAGE_TYPE_SD			= (1 << 2),
-	STORAGE_TYPE_SD1		= (1 << 3),
-	STORAGE_TYPE_SPINOR		= (1 << 9),
-	STORAGE_TYPE_SPINAND	= (1 << 8),
-	STORAGE_TYPE_RAM		= (1 << 6),
-	STORAGE_TYPE_USB		= (1 << 7),
-	STORAGE_TYPE_SATA		= (1 << 10),
-	STORAGE_TYPE_PCIE		= (1 << 11),
+	STORAGE_TYPE_UNKNOWN				= (0 << 0),
+	STORAGE_TYPE_FLASH					= (1 << 0),
+	STORAGE_TYPE_EMMC					= (1 << 1),
+	STORAGE_TYPE_SD						= (1 << 2),
+	STORAGE_TYPE_SD1					= (1 << 3),
+	STORAGE_TYPE_SPINOR					= (1 << 9),
+	STORAGE_TYPE_SPINAND				= (1 << 8),
+	STORAGE_TYPE_RAM					= (1 << 6),
+	STORAGE_TYPE_USB					= (1 << 7),
+	STORAGE_TYPE_SATA					= (1 << 10),
+	STORAGE_TYPE_PCIE					= (1 << 11),
 };
 
 struct chip_t {
