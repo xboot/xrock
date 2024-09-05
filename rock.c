@@ -375,6 +375,45 @@ int rock_capability(struct xrock_ctx_t * ctx, uint8_t * buf)
 	return 1;
 }
 
+int rock_capability_support(struct xrock_ctx_t * ctx, enum capability_type_t type)
+{
+	uint8_t buf[8] = { 0 };
+
+	if(rock_capability(ctx, buf))
+	{
+		switch(type)
+		{
+		case CAPABILITY_TYPE_DIRECT_LBA:
+			return (buf[0] & (1 << 0)) ? 1 : 0;
+		case CAPABILITY_TYPE_VENDOR_STORAGE:
+			return (buf[0] & (1 << 1)) ? 1 : 0;
+		case CAPABILITY_TYPE_FIRST_4M_ACCESS:
+			return (buf[0] & (1 << 2)) ? 1 : 0;
+		case CAPABILITY_TYPE_READ_LBA:
+			return (buf[0] & (1 << 3)) ? 1 : 0;
+		case CAPABILITY_TYPE_READ_COM_LOG:
+			return (buf[0] & (1 << 5)) ? 1 : 0;
+		case CAPABILITY_TYPE_READ_IDB_CONFIG:
+			return (buf[0] & (1 << 6)) ? 1 : 0;
+		case CAPABILITY_TYPE_READ_SECURE_MODE:
+			return (buf[0] & (1 << 7)) ? 1 : 0;
+		case CAPABILITY_TYPE_NEW_IDB:
+			return (buf[1] & (1 << 0)) ? 1 : 0;
+		case CAPABILITY_TYPE_SWITCH_STORAGE:
+			return (buf[1] & (1 << 1)) ? 1 : 0;
+		case CAPABILITY_TYPE_LBA_PARITY:
+			return (buf[1] & (1 << 2)) ? 1 : 0;
+		case CAPABILITY_TYPE_READ_OTP_CHIP:
+			return (buf[1] & (1 << 3)) ? 1 : 0;
+		case CAPABILITY_TYPE_SWITCH_USB3:
+			return (buf[1] & (1 << 4)) ? 1 : 0;
+		default:
+			break;
+		}
+	}
+	return 0;
+}
+
 int rock_reset(struct xrock_ctx_t * ctx, int maskrom)
 {
 	struct usb_request_t req;

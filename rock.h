@@ -13,6 +13,21 @@ extern "C" {
 #include <loader.h>
 #include <progress.h>
 
+enum capability_type_t {
+	CAPABILITY_TYPE_DIRECT_LBA			= (0 << 0),
+	CAPABILITY_TYPE_VENDOR_STORAGE		= (1 << 1),
+	CAPABILITY_TYPE_FIRST_4M_ACCESS		= (1 << 2),
+	CAPABILITY_TYPE_READ_LBA			= (1 << 3),
+	CAPABILITY_TYPE_READ_COM_LOG		= (1 << 4),
+	CAPABILITY_TYPE_READ_IDB_CONFIG		= (1 << 5),
+	CAPABILITY_TYPE_READ_SECURE_MODE	= (1 << 6),
+	CAPABILITY_TYPE_NEW_IDB				= (1 << 7),
+	CAPABILITY_TYPE_SWITCH_STORAGE		= (1 << 8),
+	CAPABILITY_TYPE_LBA_PARITY			= (1 << 9),
+	CAPABILITY_TYPE_READ_OTP_CHIP		= (1 << 10),
+	CAPABILITY_TYPE_SWITCH_USB3			= (1 << 11),
+};
+
 enum storage_type_t {
 	STORAGE_TYPE_UNKNOWN	= (0 << 0),
 	STORAGE_TYPE_FLASH		= (1 << 0),
@@ -58,6 +73,7 @@ void rock_maskrom_upload_file(struct xrock_ctx_t * ctx, uint32_t code, const cha
 int rock_ready(struct xrock_ctx_t * ctx);
 int rock_version(struct xrock_ctx_t * ctx, uint8_t * buf);
 int rock_capability(struct xrock_ctx_t * ctx, uint8_t * buf);
+int rock_capability_support(struct xrock_ctx_t * ctx, enum capability_type_t type);
 int rock_reset(struct xrock_ctx_t * ctx, int maskrom);
 int rock_exec(struct xrock_ctx_t * ctx, uint32_t addr, uint32_t dtb);
 int rock_read(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len);
