@@ -149,8 +149,18 @@ static inline void write_be32(void * addr, uint32_t val)
 	p[3] = (val >> 0) & 0xff;
 }
 
-#define ARRAY_SIZE(array)	(sizeof(array) / sizeof((array)[0]))
-#define X(...)				("" #__VA_ARGS__ "")
+#define XMAP(x, ia, ib, oa, ob)		((x - ia) * (ob - oa) / (ib - ia) + oa)
+#define XMIN(a, b)					({typeof(a) _amin = (a); typeof(b) _bmin = (b); (void)(&_amin == &_bmin); _amin < _bmin ? _amin : _bmin;})
+#define XMAX(a, b)					({typeof(a) _amax = (a); typeof(b) _bmax = (b); (void)(&_amax == &_bmax); _amax > _bmax ? _amax : _bmax;})
+#define XCLAMP(v, a, b)				XMIN(XMAX(a, v), b)
+
+#define XFLOOR(x)					((x) > 0 ? (int)(x) : (int)((x) - 0.9999999999))
+#define XROUND(x)					((x) > 0 ? (int)((x) + 0.5) : (int)((x) - 0.5))
+#define XCEIL(x)					((x) > 0 ? (int)((x) + 0.9999999999) : (int)(x))
+#define XDIV255(x)					((((int)(x) + 1) * 257) >> 16)
+
+#define ARRAY_SIZE(array)			(sizeof(array) / sizeof((array)[0]))
+#define X(...)						("" #__VA_ARGS__ "")
 
 #ifdef __cplusplus
 }

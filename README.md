@@ -56,28 +56,28 @@ For 32-bits windows, you can using `i686-w64-mingw32-` instead of `x86_64-w64-mi
 
 ```shell
 usage:
-    xrock maskrom <ddr> <usbplug> [--rc4-off] - Initial chip using ddr and usbplug in maskrom mode
-    xrock download <loader>                   - Initial chip using loader in maskrom mode
-    xrock ready                               - Show chip ready or not
-    xrock version                             - Show chip version
-    xrock capability                          - Show capability information
-    xrock reset [maskrom]                     - Reset chip to normal or maskrom mode
-    xrock hexdump <address> <length>          - Dump memory region in hex
-    xrock dump <address> <length>             - Binary memory dump to stdout
-    xrock read <address> <length> <file>      - Read memory to file
-    xrock write <address> <file>              - Write file to memory
-    xrock exec <address> [dtb]                - Call function address
-    xrock otp <length>                        - Dump otp memory in hex
-    xrock sn                                  - Read serial number
-    xrock sn <string>                         - Write serial number
-    xrock vs read <index> <length> [type]     - Read vendor storage
-    xrock vs write <index> <string> [type]    - Write vendor storage
-    xrock storage                             - Read storage media list
-    xrock storage <index>                     - Switch storage media and show list
-    xrock flash                               - Detect flash and show information
-    xrock flash erase <sector> <count>        - Erase flash sector
-    xrock flash read <sector> <count> <file>  - Read flash sector to file
-    xrock flash write <sector> <file>         - Write file to flash sector
+    xrock maskrom <ddr> <usbplug> [--rc4-off]    - Initial chip using ddr and usbplug in maskrom mode
+    xrock download <loader>                      - Initial chip using loader in maskrom mode
+    xrock ready                                  - Show chip ready or not
+    xrock version                                - Show chip version
+    xrock capability                             - Show capability information
+    xrock reset [maskrom]                        - Reset chip to normal or maskrom mode
+    xrock dump <address> <length>                - Dump memory region in hex format
+    xrock read <address> <length> <file>         - Read memory to file
+    xrock write <address> <file>                 - Write file to memory
+    xrock exec <address> [dtb]                   - Call function address
+    xrock otp <length>                           - Dump otp memory in hex format
+    xrock sn                                     - Read serial number
+    xrock sn <string>                            - Write serial number
+    xrock vs dump <index> <length> [type]        - Dump vendor storage in hex format
+    xrock vs read <index> <length> <file> [type] - Read vendor storage
+    xrock vs write <index> <file> [type]         - Write vendor storage
+    xrock storage                                - Read storage media list
+    xrock storage <index>                        - Switch storage media and show list
+    xrock flash                                  - Detect flash and show information
+    xrock flash erase <sector> <count>           - Erase flash sector
+    xrock flash read <sector> <count> <file>     - Read flash sector to file
+    xrock flash write <sector> <file>            - Write file to flash sector
 extra:
     xrock extra maskrom --rc4 <on|off> [--sram <file> --delay <ms>] [--dram <file> --delay <ms>] [...]
 ```

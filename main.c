@@ -20,28 +20,28 @@ static void usage(void)
 	printf("    QQ: 8192542\r\n");
 
 	printf("usage:\r\n");
-	printf("    xrock maskrom <ddr> <usbplug> [--rc4-off] - Initial chip using ddr and usbplug in maskrom mode\r\n");
-	printf("    xrock download <loader>                   - Initial chip using loader in maskrom mode\r\n");
-	printf("    xrock ready                               - Show chip ready or not\r\n");
-	printf("    xrock version                             - Show chip version\r\n");
-	printf("    xrock capability                          - Show capability information\r\n");
-	printf("    xrock reset [maskrom]                     - Reset chip to normal or maskrom mode\n");
-	printf("    xrock hexdump <address> <length>          - Dump memory region in hex\r\n");
-	printf("    xrock dump <address> <length>             - Binary memory dump to stdout\r\n");
-	printf("    xrock read <address> <length> <file>      - Read memory to file\r\n");
-	printf("    xrock write <address> <file>              - Write file to memory\r\n");
-	printf("    xrock exec <address> [dtb]                - Call function address\r\n");
-	printf("    xrock otp <length>                        - Dump otp memory in hex\r\n");
-	printf("    xrock sn                                  - Read serial number\r\n");
-	printf("    xrock sn <string>                         - Write serial number\r\n");
-	printf("    xrock vs read <index> <length> [type]     - Read vendor storage\r\n");
-	printf("    xrock vs write <index> <string> [type]    - Write vendor storage\r\n");
-	printf("    xrock storage                             - Read storage media list\r\n");
-	printf("    xrock storage <index>                     - Switch storage media and show list\r\n");
-	printf("    xrock flash                               - Detect flash and show information\r\n");
-	printf("    xrock flash erase <sector> <count>        - Erase flash sector\r\n");
-	printf("    xrock flash read <sector> <count> <file>  - Read flash sector to file\r\n");
-	printf("    xrock flash write <sector> <file>         - Write file to flash sector\r\n");
+	printf("    xrock maskrom <ddr> <usbplug> [--rc4-off]    - Initial chip using ddr and usbplug in maskrom mode\r\n");
+	printf("    xrock download <loader>                      - Initial chip using loader in maskrom mode\r\n");
+	printf("    xrock ready                                  - Show chip ready or not\r\n");
+	printf("    xrock version                                - Show chip version\r\n");
+	printf("    xrock capability                             - Show capability information\r\n");
+	printf("    xrock reset [maskrom]                        - Reset chip to normal or maskrom mode\n");
+	printf("    xrock dump <address> <length>                - Dump memory region in hex format\r\n");
+	printf("    xrock read <address> <length> <file>         - Read memory to file\r\n");
+	printf("    xrock write <address> <file>                 - Write file to memory\r\n");
+	printf("    xrock exec <address> [dtb]                   - Call function address\r\n");
+	printf("    xrock otp <length>                           - Dump otp memory in hex format\r\n");
+	printf("    xrock sn                                     - Read serial number\r\n");
+	printf("    xrock sn <string>                            - Write serial number\r\n");
+	printf("    xrock vs dump <index> <length> [type]        - Dump vendor storage in hex format\r\n");
+	printf("    xrock vs read <index> <length> <file> [type] - Read vendor storage\r\n");
+	printf("    xrock vs write <index> <file> [type]         - Write vendor storage\r\n");
+	printf("    xrock storage                                - Read storage media list\r\n");
+	printf("    xrock storage <index>                        - Switch storage media and show list\r\n");
+	printf("    xrock flash                                  - Detect flash and show information\r\n");
+	printf("    xrock flash erase <sector> <count>           - Erase flash sector\r\n");
+	printf("    xrock flash read <sector> <count> <file>     - Read flash sector to file\r\n");
+	printf("    xrock flash write <sector> <file>            - Write file to flash sector\r\n");
 
 	printf("extra:\r\n");
 	printf("    xrock extra maskrom --rc4 <on|off> [--sram <file> --delay <ms>] [--dram <file> --delay <ms>] [...]\r\n");
@@ -222,25 +222,6 @@ int main(int argc, char * argv[])
 		else
 			rock_reset(&ctx, 0);
 	}
-	else if(!strcmp(argv[1], "hexdump"))
-	{
-		argc -= 2;
-		argv += 2;
-		if(argc == 2)
-		{
-			uint32_t addr = strtoul(argv[0], NULL, 0);
-			size_t len = strtoul(argv[1], NULL, 0);
-			char * buf = malloc(len);
-			if(buf)
-			{
-				rock_read(&ctx, addr, buf, len);
-				hexdump(addr, buf, len);
-				free(buf);
-			}
-		}
-		else
-			usage();
-	}
 	else if(!strcmp(argv[1], "dump"))
 	{
 		argc -= 2;
@@ -253,7 +234,7 @@ int main(int argc, char * argv[])
 			if(buf)
 			{
 				rock_read(&ctx, addr, buf, len);
-				fwrite(buf, len, 1, stdout);
+				hexdump(addr, buf, len);
 				free(buf);
 			}
 		}
@@ -374,10 +355,10 @@ int main(int argc, char * argv[])
 			argv += 2;
 			if(argc > 0)
 			{
-				if(!strcmp(argv[0], "read") && (argc >= 3))
+				if(!strcmp(argv[0], "dump") && (argc >= 3))
 				{
 					int index = strtoul(argv[1], NULL, 0);
-					int len = strtoul(argv[2], NULL, 0);
+					int len = XMIN((int)strtoul(argv[2], NULL, 0), 512);
 					int type = (argc == 4) ? strtoul(argv[3], NULL, 0) : 0;
 					if(len > 0)
 					{
@@ -390,26 +371,33 @@ int main(int argc, char * argv[])
 						}
 					}
 				}
+				else if(!strcmp(argv[0], "read") && (argc >= 4))
+				{
+					int index = strtoul(argv[1], NULL, 0);
+					int len = XMIN((int)strtoul(argv[2], NULL, 0), 512);
+					int type = (argc == 5) ? strtoul(argv[4], NULL, 0) : 0;
+					if(len > 0)
+					{
+						uint8_t * buf = malloc(len);
+						if(buf)
+						{
+							if(rock_vs_read(&ctx, type, index, buf, len))
+								file_save(argv[3], buf, len);
+							free(buf);
+						}
+					}
+				}
 				else if(!strcmp(argv[0], "write") && (argc >= 3))
 				{
 					int index = strtoul(argv[1], NULL, 0);
 					int type = (argc == 4) ? strtoul(argv[3], NULL, 0) : 0;
-					int len = strlen(argv[2]);
-					if(len > 0)
+					uint64_t len;
+					void * buf = file_load(argv[2], &len);
+					if(buf && (len > 0))
 					{
-						uint8_t * buf = malloc(len + 8);
-						if(buf)
-						{
-							memset(buf, 0, sizeof(len + 8));
-							write_le32(&buf[0], 1);
-							write_le32(&buf[4], len);
-							memcpy(&buf[8], argv[2], len);
-							if(rock_vs_write(&ctx, type, index, buf, len + 8))
-								printf("Write vendor storage success\r\n");
-							else
-								printf("Failed to write vendor storage\r\n");
-							free(buf);
-						}
+						if(!rock_vs_write(&ctx, type, index, buf, (len > 512) ? 512 : len))
+							printf("Failed to write vendor storage\r\n");
+						free(buf);
 					}
 				}
 				else
