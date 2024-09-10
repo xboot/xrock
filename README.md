@@ -88,6 +88,8 @@ extra:
 
 - The memory base address from 0, **NOT** sdram's physical address.
 
+- In some u-boot rockusb driver, The flash dump operation be limited to the start of 32MB, you can patch u-boot's macro `RKUSB_READ_LIMIT_ADDR`.
+
 ### RV1106
 
 ```shell
