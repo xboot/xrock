@@ -90,6 +90,21 @@ extra:
 
 - In some u-boot rockusb driver, The flash dump operation be limited to the start of 32MB, you can patch u-boot's macro `RKUSB_READ_LIMIT_ADDR`.
 
+```
+diff --git a/u-boot/cmd/rockusb.c b/u-boot/cmd/rockusb.c
+--- a/u-boot/cmd/rockusb.c
++++ b/u-boot/cmd/rockusb.c
+@@ -26,7 +26,7 @@ static int rkusb_read_sector(struct ums *ums_dev,
+        lbaint_t blkstart = start + ums_dev->start_sector;
+        int ret;
+
+-       if ((blkstart + blkcnt) > RKUSB_READ_LIMIT_ADDR) {
++       if ((blkstart + blkcnt) > RKUSB_READ_LIMIT_ADDR && 0) {
+                memset(buf, 0xcc, blkcnt * SECTOR_SIZE);
+                return blkcnt;
+        } else {
+```
+
 ### RV1106
 
 ```shell
