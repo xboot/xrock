@@ -95,6 +95,8 @@ int rock_flash_write_lba(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, v
 int rock_flash_erase_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt);
 int rock_flash_read_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, void * buf);
 int rock_flash_write_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, void * buf);
+int rock_flash_read_lba_to_file_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, const char * filename);
+int rock_flash_write_lba_from_file_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t maxcnt, const char * filename);
 
 #ifdef __cplusplus
 }

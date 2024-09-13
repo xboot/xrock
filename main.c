@@ -566,15 +566,8 @@ int main(int argc, char * argv[])
 							cnt = info.sector_total - sec;
 						else if(cnt > info.sector_total - sec)
 							cnt = info.sector_total - sec;
-						char * buf = malloc((uint64_t)cnt << 9);
-						if(buf)
-						{
-							if(rock_flash_read_lba_progress(&ctx, sec, cnt, buf))
-								file_save(argv[2], buf, (uint64_t)cnt << 9);
-							else
-								printf("Failed to read flash\r\n");
-							free(buf);
-						}
+						if(!rock_flash_read_lba_to_file_progress(&ctx, sec, cnt, argv[2]))
+							printf("Failed to read flash\r\n");
 					}
 					else
 						printf("The start sector is out of range\r\n");
@@ -588,31 +581,12 @@ int main(int argc, char * argv[])
 				argv += 1;
 				struct flash_info_t info;
 				uint32_t sec = strtoul(argv[0], NULL, 0);
-				uint32_t cnt;
-				void * buf;
-				uint64_t len;
 				if(rock_flash_detect(&ctx, &info))
 				{
 					if(sec < info.sector_total)
 					{
-						buf = file_load(argv[1], &len);
-						if(buf)
-						{
-							if(len % 512 != 0)
-							{
-								cnt = (len >> 9) + 1;
-								buf = realloc(buf, (uint64_t)cnt << 9);
-							}
-							else
-								cnt = (len >> 9);
-							if(cnt <= 0)
-								cnt = info.sector_total - sec;
-							else if(cnt > info.sector_total - sec)
-								cnt = info.sector_total - sec;
-							if(!rock_flash_write_lba_progress(&ctx, sec, cnt, buf))
-								printf("Failed to write flash\\r\n");
-							free(buf);
-						}
+						if(!rock_flash_write_lba_from_file_progress(&ctx, sec, info.sector_total, argv[1]))
+							printf("Failed to write flash\r\n");
 					}
 					else
 						printf("The start sector is out of range\r\n");

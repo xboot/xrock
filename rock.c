@@ -906,7 +906,7 @@ int rock_flash_read_lba(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, vo
 
 	while(cnt > 0)
 	{
-		n = cnt > 128 ? 128 : cnt;
+		n = cnt > 16384 ? 16384 : cnt;
 		if(!rock_flash_read_lba_raw(ctx, sec, n, buf))
 			return 0;
 		sec += n;
@@ -922,7 +922,7 @@ int rock_flash_write_lba(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, v
 
 	while(cnt > 0)
 	{
-		n = cnt > 128 ? 128 : cnt;
+		n = cnt > 16384 ? 16384 : cnt;
 		if(!rock_flash_write_lba_raw(ctx, sec, n, buf))
 			return 0;
 		sec += n;
@@ -959,7 +959,7 @@ int rock_flash_read_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_
 	progress_start(&p, (uint64_t)cnt << 9);
 	while(cnt > 0)
 	{
-		n = cnt > 128 ? 128 : cnt;
+		n = cnt > 16384 ? 16384 : cnt;
 		if(!rock_flash_read_lba_raw(ctx, sec, n, buf))
 			return 0;
 		sec += n;
@@ -979,7 +979,7 @@ int rock_flash_write_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32
 	progress_start(&p, (uint64_t)cnt << 9);
 	while(cnt > 0)
 	{
-		n = cnt > 128 ? 128 : cnt;
+		n = cnt > 16384 ? 16384 : cnt;
 		if(!rock_flash_write_lba_raw(ctx, sec, n, buf))
 			return 0;
 		sec += n;
@@ -988,5 +988,118 @@ int rock_flash_write_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32
 		progress_update(&p, (uint64_t)n << 9);
 	}
 	progress_stop(&p);
+	return 1;
+}
+
+int rock_flash_read_lba_to_file_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, const char * filename)
+{
+	int MAXSEC = 16384;
+
+	FILE * f = fopen(filename, "w");
+	if(!f)
+		return 0;
+
+	void * buf = malloc(MAXSEC << 9);
+	if(!buf)
+	{
+		fclose(f);
+		return 0;
+	}
+
+	struct progress_t p;
+	progress_start(&p, (uint64_t)cnt << 9);
+	while(cnt > 0)
+	{
+		uint32_t n = cnt > MAXSEC ? MAXSEC : cnt;
+		memset(buf, 0, MAXSEC << 9);
+		if(!rock_flash_read_lba_raw(ctx, sec, n, buf))
+		{
+			if(buf)
+				free(buf);
+			if(f)
+				fclose(f);
+			return 0;
+		}
+		if(fwrite(buf, 512, n, f) != n)
+		{
+			if(buf)
+				free(buf);
+			if(f)
+				fclose(f);
+			return 0;
+		}
+		sec += n;
+		cnt -= n;
+		progress_update(&p, (uint64_t)n << 9);
+	}
+	progress_stop(&p);
+
+	free(buf);
+	fclose(f);
+	return 1;
+}
+
+int rock_flash_write_lba_from_file_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t maxcnt, const char * filename)
+{
+	int MAXSEC = 16384;
+
+	FILE * f = fopen(filename, "r");
+	if(!f)
+		return 0;
+
+	fseek(f, 0, SEEK_END);
+	int64_t len = ftell(f);
+	if(len <= 0)
+	{
+		fclose(f);
+		return 0;
+	}
+	fseek(f, 0, SEEK_SET);
+
+	uint32_t cnt = (len >> 9);
+	if(len % 512 != 0)
+		cnt += 1;
+	if(cnt <= 0)
+		cnt = maxcnt - sec;
+	else if(cnt > maxcnt - sec)
+		cnt = maxcnt - sec;
+
+	void * buf = malloc(MAXSEC << 9);
+	if(!buf)
+	{
+		fclose(f);
+		return 0;
+	}
+
+	struct progress_t p;
+	progress_start(&p, (uint64_t)cnt << 9);
+	while(cnt > 0)
+	{
+		uint32_t n = cnt > MAXSEC ? MAXSEC : cnt;
+		memset(buf, 0, MAXSEC << 9);
+		if(fread(buf, 512, n, f) != n)
+		{
+			if(buf)
+				free(buf);
+			if(f)
+				fclose(f);
+			return 0;
+		}
+		if(!rock_flash_write_lba_raw(ctx, sec, n, buf))
+		{
+			if(buf)
+				free(buf);
+			if(f)
+				fclose(f);
+			return 0;
+		}
+		sec += n;
+		cnt -= n;
+		progress_update(&p, (uint64_t)n << 9);
+	}
+	progress_stop(&p);
+
+	free(buf);
+	fclose(f);
 	return 1;
 }
