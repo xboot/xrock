@@ -934,13 +934,17 @@ int rock_flash_write_lba(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, v
 
 int rock_flash_erase_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt)
 {
+	int MAXSEC = 16384;
 	struct progress_t p;
 	uint32_t n;
+
+	if(cnt <= 65536)
+		MAXSEC = 128;
 
 	progress_start(&p, (uint64_t)cnt << 9);
 	while(cnt > 0)
 	{
-		n = cnt > 16384 ? 16384 : cnt;
+		n = cnt > MAXSEC ? MAXSEC : cnt;
 		if(!rock_flash_erase_lba_raw(ctx, sec, n))
 			return 0;
 		sec += n;
@@ -953,13 +957,17 @@ int rock_flash_erase_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32
 
 int rock_flash_read_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, void * buf)
 {
+	int MAXSEC = 16384;
 	struct progress_t p;
 	uint32_t n;
+
+	if(cnt <= 65536)
+		MAXSEC = 128;
 
 	progress_start(&p, (uint64_t)cnt << 9);
 	while(cnt > 0)
 	{
-		n = cnt > 16384 ? 16384 : cnt;
+		n = cnt > MAXSEC ? MAXSEC : cnt;
 		if(!rock_flash_read_lba_raw(ctx, sec, n, buf))
 			return 0;
 		sec += n;
@@ -973,13 +981,17 @@ int rock_flash_read_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_
 
 int rock_flash_write_lba_progress(struct xrock_ctx_t * ctx, uint32_t sec, uint32_t cnt, void * buf)
 {
+	int MAXSEC = 16384;
 	struct progress_t p;
 	uint32_t n;
+
+	if(cnt <= 65536)
+		MAXSEC = 128;
 
 	progress_start(&p, (uint64_t)cnt << 9);
 	while(cnt > 0)
 	{
-		n = cnt > 16384 ? 16384 : cnt;
+		n = cnt > MAXSEC ? MAXSEC : cnt;
 		if(!rock_flash_write_lba_raw(ctx, sec, n, buf))
 			return 0;
 		sec += n;
@@ -998,6 +1010,9 @@ int rock_flash_read_lba_to_file_progress(struct xrock_ctx_t * ctx, uint32_t sec,
 	FILE * f = fopen(filename, "w");
 	if(!f)
 		return 0;
+
+	if(cnt <= 65536)
+		MAXSEC = 128;
 
 	void * buf = malloc(MAXSEC << 9);
 	if(!buf)
@@ -1063,6 +1078,9 @@ int rock_flash_write_lba_from_file_progress(struct xrock_ctx_t * ctx, uint32_t s
 		cnt = maxcnt - sec;
 	else if(cnt > maxcnt - sec)
 		cnt = maxcnt - sec;
+
+	if(cnt <= 65536)
+		MAXSEC = 128;
 
 	void * buf = malloc(MAXSEC << 9);
 	if(!buf)
