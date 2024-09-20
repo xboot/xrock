@@ -113,7 +113,7 @@ sudo xrock version
 ```
 
 ```shell
-sudo xrock extra maskrom --rc4 off --sram rv1103_ddr_924MHz_v1.15.bin --delay 10
+sudo xrock extra maskrom --rc4 off --sram rv1106_ddr_924MHz_v1.15.bin --delay 10
 sudo xrock extra maskrom-write-arm32 --rc4 off 0x00000000 xstar.bin
 sudo xrock extra maskrom-exec-arm32 --rc4 off 0x00000000
 ```
