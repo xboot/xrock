@@ -325,7 +325,7 @@ void rock_maskrom_write_arm32_progress(struct xrock_ctx_t * ctx, uint32_t addr, 
 	progress_start(&p, len);
 	while(len > 0)
 	{
-		n = len > 1024 ? 1024 : len;
+		n = len > 16384 ? 16384 : len;
 		rock_maskrom_write_arm32(ctx, addr, buf, n, rc4);
 		addr += n;
 		buf += n;
