@@ -115,9 +115,9 @@ int main(int argc, char * argv[])
 						char str[256];
 						if(e->type == RKLOADER_ENTRY_471)
 						{
-							void * buf = (char *)bctx->buffer + read_le32(&e->data_offset);
-							uint64_t len = read_le32(&e->data_size);
-							uint32_t delay = read_le32(&e->data_delay);
+							void * buf = (char *)bctx->buffer + get_unaligned_le32(&e->data_offset);
+							uint64_t len = get_unaligned_le32(&e->data_size);
+							uint32_t delay = get_unaligned_le32(&e->data_delay);
 
 							printf("Downloading '%s'\r\n", loader_wide2str(str, (uint8_t *)&e->name[0], sizeof(e->name)));
 							rock_maskrom_upload_memory(&ctx, 0x471, buf, len, bctx->header->rc4_flag ? 0 : 1);
@@ -125,9 +125,9 @@ int main(int argc, char * argv[])
 						}
 						else if(e->type == RKLOADER_ENTRY_472)
 						{
-							void * buf = (char *)bctx->buffer + read_le32(&e->data_offset);
-							uint64_t len = read_le32(&e->data_size);
-							uint32_t delay = read_le32(&e->data_delay);
+							void * buf = (char *)bctx->buffer + get_unaligned_le32(&e->data_offset);
+							uint64_t len = get_unaligned_le32(&e->data_size);
+							uint32_t delay = get_unaligned_le32(&e->data_delay);
 
 							printf("Downloading '%s'\r\n", loader_wide2str(str, (uint8_t *)&e->name[0], sizeof(e->name)));
 							rock_maskrom_upload_memory(&ctx, 0x472, buf, len, bctx->header->rc4_flag ? 0 : 1);

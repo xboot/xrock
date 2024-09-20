@@ -55,7 +55,7 @@ struct rkloader_ctx_t * rkloader_ctx_alloc(const char * filename)
 	}
 
 	struct rkloader_entry_t * e = ctx->entry[ctx->nentry - 1];
-	uint32_t len = read_le32(&e->data_offset) + read_le32(&e->data_size);
+	uint32_t len = get_unaligned_le32(&e->data_offset) + get_unaligned_le32(&e->data_size);
 	if(ctx->length != len + 4)
 	{
 		if(ctx->buffer)
@@ -66,7 +66,7 @@ struct rkloader_ctx_t * rkloader_ctx_alloc(const char * filename)
 	}
 
 	uint32_t crc32 = 0x0;
-	if(crc32_sum(crc32, (const uint8_t *)ctx->buffer, len) != read_le32((char *)ctx->buffer + len))
+	if(crc32_sum(crc32, (const uint8_t *)ctx->buffer, len) != get_unaligned_le32((char *)ctx->buffer + len))
 	{
 		if(ctx->buffer)
 			free(ctx->buffer);
