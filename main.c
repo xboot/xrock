@@ -45,6 +45,8 @@ static void usage(void)
 
 	printf("extra:\r\n");
 	printf("    xrock extra maskrom --rc4 <on|off> [--sram <file> --delay <ms>] [--dram <file> --delay <ms>] [...]\r\n");
+	printf("    xrock extra maskrom-write-arm32 --rc4 <on|off> <address> <file>\r\n");
+	printf("    xrock extra maskrom-exec-arm32 --rc4 <on|off> <address>\r\n");
 }
 
 int main(int argc, char * argv[])
@@ -646,6 +648,91 @@ int main(int argc, char * argv[])
 							usage();
 						}
 					}
+				}
+				else
+					printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
+			}
+			else
+				usage();
+		}
+		else if(!strcmp(argv[0], "maskrom-write-arm32"))
+		{
+			argc -= 1;
+			argv += 1;
+			if(argc >= 2)
+			{
+				if(ctx.maskrom)
+				{
+					int rc4 = 0;
+					char * filename = NULL;
+					uint32_t addr = 0x0;
+					for(int i = 0, idx = 0; i < argc; i++)
+					{
+						if(!strcmp(argv[i], "--rc4") && (argc > i + 1))
+						{
+							if(!strcmp(argv[i + 1], "on"))
+								rc4 = 1;
+							else if(!strcmp(argv[i + 1], "off"))
+								rc4 = 0;
+							i++;
+						}
+						else if(*argv[i] == '-')
+						{
+							usage();
+						}
+						else if(*argv[i] != '-' && strcmp(argv[i], "-") != 0)
+						{
+							if(idx == 0)
+								addr = strtoul(argv[i], NULL, 0);
+							else if(idx == 1)
+								filename = argv[i];
+							idx++;
+						}
+					}
+					uint64_t len;
+					void * buf = file_load(filename, &len);
+					if(buf)
+					{
+						rock_maskrom_write_arm32_progress(&ctx, addr, buf, len, rc4);
+						free(buf);
+					}
+				}
+				else
+					printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
+			}
+			else
+				usage();
+		}
+		else if(!strcmp(argv[0], "maskrom-exec-arm32"))
+		{
+			argc -= 1;
+			argv += 1;
+			if(argc >= 2)
+			{
+				if(ctx.maskrom)
+				{
+					int rc4 = 0;
+					uint32_t addr = 0x0;
+					for(int i = 0; i < argc; i++)
+					{
+						if(!strcmp(argv[i], "--rc4") && (argc > i + 1))
+						{
+							if(!strcmp(argv[i + 1], "on"))
+								rc4 = 1;
+							else if(!strcmp(argv[i + 1], "off"))
+								rc4 = 0;
+							i++;
+						}
+						else if(*argv[i] == '-')
+						{
+							usage();
+						}
+						else if(*argv[i] != '-' && strcmp(argv[i], "-") != 0)
+						{
+							addr = strtoul(argv[i], NULL, 0);
+						}
+					}
+					rock_maskrom_exec_arm32(&ctx, addr, rc4);
 				}
 				else
 					printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);

@@ -1,0 +1,10 @@
+#
+# Normal rules
+#
+*~
+*.o
+*.bin
+
+#
+# Generated files
+#
