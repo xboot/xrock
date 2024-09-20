@@ -51,7 +51,6 @@ CROSS=x86_64-w64-mingw32- make -f Makefile.win
 
 For 32-bits windows, you can using `i686-w64-mingw32-` instead of `x86_64-w64-mingw32` above.
 
-
 ## Usage
 
 ```shell
@@ -64,7 +63,7 @@ For 32-bits windows, you can using `i686-w64-mingw32-` instead of `x86_64-w64-mi
     xrock dump <address> <length>                - Dump memory region in hex format
     xrock read <address> <length> <file>         - Read memory to file
     xrock write <address> <file>                 - Write file to memory
-    xrock exec <address> [dtb]                   - Call function address
+    xrock exec <address> [dtb]                   - Call function address(Recommend to use extra command)
     xrock otp <length>                           - Dump otp memory in hex format
     xrock sn                                     - Read serial number
     xrock sn <string>                            - Write serial number
@@ -109,8 +108,14 @@ diff --git a/u-boot/cmd/rockusb.c b/u-boot/cmd/rockusb.c
 ### RV1106
 
 ```shell
-sudo xrock maskrom rv1106_ddr_924MHz_v1.09.bin rv1106_usbplug_v1.06.bin --rc4-off
+sudo xrock maskrom rv1106_ddr_924MHz_v1.15.bin rv1106_usbplug_v1.09.bin --rc4-off
 sudo xrock version
+```
+
+```shell
+sudo xrock extra maskrom --rc4 off --sram rv1103_ddr_924MHz_v1.15.bin --delay 10
+sudo xrock extra maskrom-write-arm32 --rc4 off 0x00000000 xstar.bin
+sudo xrock extra maskrom-exec-arm32 --rc4 off 0x00000000
 ```
 
 ### RK1808

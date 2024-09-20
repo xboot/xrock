@@ -29,7 +29,7 @@ static void usage(void)
 	printf("    xrock dump <address> <length>                - Dump memory region in hex format\r\n");
 	printf("    xrock read <address> <length> <file>         - Read memory to file\r\n");
 	printf("    xrock write <address> <file>                 - Write file to memory\r\n");
-	printf("    xrock exec <address> [dtb]                   - Call function address\r\n");
+	printf("    xrock exec <address> [dtb]                   - Call function address(Recommend to use extra command)\r\n");
 	printf("    xrock otp <length>                           - Dump otp memory in hex format\r\n");
 	printf("    xrock sn                                     - Read serial number\r\n");
 	printf("    xrock sn <string>                            - Write serial number\r\n");
