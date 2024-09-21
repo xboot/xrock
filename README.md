@@ -161,8 +161,19 @@ xrock version
 ### RK3399
 
 ```shell
-xrock maskrom rk3399_ddr_800MHz_v1.25.bin rk3399_usbplug_v1.26.bin
+xrock maskrom rk3399_ddr_800MHz_v1.30.bin rk3399_usbplug_v1.30.bin
 xrock version
+```
+- Initial ddr memory
+
+```shell
+xrock extra maskrom --rc4 on --sram rk3399_ddr_800MHz_v1.30.bin --delay 10
+```
+
+- Dump rk3399 bootrom region in hex format by debug uart
+
+```shell
+xrock extra maskrom-dump-arm64 --rc4 on --uart 0xff1a0000 0xfffd0000 1024
 ```
 
 ### RK3399PRO
