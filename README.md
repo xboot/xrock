@@ -117,6 +117,11 @@ xrock maskrom rv1106_ddr_924MHz_v1.15.bin rv1106_usbplug_v1.09.bin --rc4-off
 xrock version
 ```
 
+```shell
+xrock extra maskrom --rc4 off --sram rv1106_ddr_924MHz_v1.15.bin --delay 10 --rc4 off --dram rv1106_usbplug_v1.09.bin --delay 10
+xrock version
+```
+
 - Initial ddr memory
 
 ```shell
@@ -144,11 +149,45 @@ xrock maskrom rk1808_ddr_933MHz_v1.05.bin rk1808_usbplug_v1.05.bin
 xrock version
 ```
 
+```shell
+xrock extra maskrom --rc4 on --sram rk1808_ddr_933MHz_v1.05.bin --delay 10 --rc4 on --dram rk1808_usbplug_v1.05.bin --delay 10
+xrock version
+```
+
+- Initial ddr memory
+
+```shell
+xrock extra maskrom --rc4 on --sram rk1808_ddr_933MHz_v1.05.bin --delay 10
+```
+
+- Dump bootrom region in hex format by debug uart
+
+```shell
+xrock extra maskrom-dump-arm64 --rc4 on --uart 0xff550000 0xffff0000 1024
+```
+
 ### RK3128
 
 ```shell
 xrock maskrom rk3128_ddr_300MHz_v2.12.bin rk3128_usbplug_v2.63.bin
 xrock version
+```
+
+```shell
+xrock extra maskrom --rc4 on --sram rk3128_ddr_300MHz_v2.12.bin --delay 10 --rc4 on --dram rk3128_usbplug_v2.63.bin --delay 10
+xrock version
+```
+
+- Initial ddr memory
+
+```shell
+xrock extra maskrom --rc4 on --sram rk3128_ddr_300MHz_v2.12.bin --delay 10
+```
+
+- Dump memory region in hex format by debug uart
+
+```shell
+xrock extra maskrom-dump-arm32 --rc4 on --uart 0xff1a0000 0x60000000 1024
 ```
 
 ### RK3288
@@ -158,12 +197,34 @@ xrock maskrom rk3288_ddr_400MHz_v1.11.bin rk3288_usbplug_v2.63.bin
 xrock version
 ```
 
+```shell
+xrock extra maskrom --rc4 on --sram rk3288_ddr_400MHz_v1.11.bin --delay 10 --rc4 on --dram rk3288_usbplug_v2.63.bin --delay 10
+xrock version
+```
+
+- Initial ddr memory
+
+```shell
+xrock extra maskrom --rc4 on --sram rk3288_ddr_400MHz_v1.11.bin --delay 10
+```
+
+- Dump memory region in hex format by debug uart
+
+```shell
+xrock extra maskrom-dump-arm32 --rc4 on --uart 0xff690000 0x60000000 1024
+```
+
 ### RK3399
 
 ```shell
 xrock maskrom rk3399_ddr_800MHz_v1.30.bin rk3399_usbplug_v1.30.bin
 xrock version
 ```
+```shell
+xrock extra maskrom --rc4 on --sram rk3399_ddr_800MHz_v1.30.bin --delay 10 --rc4 on --dram rk3399_usbplug_v1.30.bin --delay 10
+xrock version
+```
+
 - Initial ddr memory
 
 ```shell
@@ -183,6 +244,11 @@ xrock maskrom rk3399pro_ddr_666MHz_v1.25.bin rk3399pro_usbplug_v1.26.bin
 xrock version
 ```
 
+```shell
+xrock extra maskrom --rc4 on --sram rk3399pro_ddr_666MHz_v1.25.bin --delay 10 --rc4 on --dram rk3399pro_usbplug_v1.26.bin --delay 10
+xrock version
+```
+
 ### PX30
 
 ```shell
@@ -190,10 +256,32 @@ xrock maskrom px30_ddr_333MHz_v1.16.bin px30_usbplug_v1.31.bin
 xrock version
 ```
 
+```shell
+xrock extra maskrom --rc4 on --sram px30_ddr_333MHz_v1.16.bin --delay 10 --rc4 on --dram px30_usbplug_v1.31.bin --delay 10
+xrock version
+```
+
+- Initial ddr memory
+
+```shell
+xrock extra maskrom --rc4 on --sram px30_ddr_333MHz_v1.16.bin --delay 10
+```
+
+- Dump bootrom region in hex format by debug uart
+
+```shell
+xrock extra maskrom-dump-arm64 --rc4 on --uart 0xff160000 0xffff0000 1024
+```
+
 ### RK3308
 
 ```shell
 xrock maskrom rk3308_ddr_589MHz_uart2_m1_v1.31.bin rk3308_usbplug_v1.27.bin
+xrock version
+```
+
+```shell
+xrock extra maskrom --rc4 on --sram rk3308_ddr_589MHz_uart2_m1_v1.31.bin --delay 10 --rc4 on --dram rk3308_usbplug_v1.27.bin --delay 10
 xrock version
 ```
 
@@ -204,6 +292,11 @@ xrock maskrom rk3566_ddr_1056MHz_v1.11.bin rk356x_usbplug_v1.13.bin --rc4-off
 xrock version
 ```
 
+```shell
+xrock extra maskrom --rc4 off --sram rk3566_ddr_1056MHz_v1.11.bin --delay 10 --rc4 off --dram rk356x_usbplug_v1.13.bin --delay 10
+xrock version
+```
+
 ### RK3568
 
 ```shell
@@ -211,11 +304,33 @@ xrock maskrom rk3568_ddr_1560MHz_v1.11.bin rk356x_usbplug_v1.13.bin --rc4-off
 xrock version
 ```
 
+```shell
+xrock extra maskrom --rc4 off --sram rk3568_ddr_1560MHz_v1.11.bin --delay 10 --rc4 off --dram rk356x_usbplug_v1.13.bin --delay 10
+xrock version
+```
+
 ### RK3588
 
 ```shell
-xrock maskrom rk3588_ddr_lp4_2112MHz_lp5_2736MHz_v1.05.bin rk3588_usbplug_v1.07.bin --rc4-off
+xrock maskrom rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin rk3588_usbplug_v1.11.bin --rc4-off
 xrock version
+```
+
+```shell\
+xrock extra maskrom --rc4 off --sram rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin --delay 10 --rc4 off --dram rk3588_usbplug_v1.11.bin --delay 10
+xrock version
+```
+
+- Initial ddr memory
+
+```shell
+xrock extra maskrom --rc4 off --sram rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin --delay 10
+```
+
+- Dump memory region in hex format by debug uart
+
+```shell
+xrock extra maskrom-dump-arm64 --rc4 off --uart 0xfeb50000 0xffff0000 1024
 ```
 
 ### RK3562
@@ -225,12 +340,22 @@ xrock maskrom rk3562_ddr_1332MHz_v1.05.bin rk3562_usbplug_v1.04.bin --rc4-off
 xrock version
 ```
 
+```shell
+xrock extra maskrom --rc4 off --sram rk3562_ddr_1332MHz_v1.05.bin --delay 10 --rc4 off --dram rk3562_usbplug_v1.04.bin --delay 10
+xrock version
+```
+
 ### RK3576
 
 ```shell
 xrock maskrom rk3576_ddr_lp4_2112MHz_lp5_2736MHz_v1.05.bin rk3576_usbplug_v1.02.bin --rc4-off
 xrock version
 ```
+```shell
+xrock extra maskrom --rc4 off --sram rk3576_ddr_lp4_2112MHz_lp5_2736MHz_v1.05.bin --delay 10 --rc4 off --dram rk3576_usbplug_v1.02.bin --delay 10
+xrock version
+```
+
 - Initial ddr memory
 
 ```shell
