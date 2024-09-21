@@ -45,6 +45,7 @@ static void usage(void)
 
 	printf("extra:\r\n");
 	printf("    xrock extra maskrom --rc4 <on|off> [--sram <file> --delay <ms>] [--dram <file> --delay <ms>] [...]\r\n");
+	printf("    xrock extra maskrom-dump-arm32 --rc4 <on|off> --uart <register> <address> <length>\r\n");
 	printf("    xrock extra maskrom-dump-arm64 --rc4 <on|off> --uart <register> <address> <length>\r\n");
 	printf("    xrock extra maskrom-write-arm32 --rc4 <on|off> <address> <file>\r\n");
 	printf("    xrock extra maskrom-write-arm64 --rc4 <on|off> <address> <file>\r\n");
@@ -651,6 +652,54 @@ int main(int argc, char * argv[])
 							usage();
 						}
 					}
+				}
+				else
+					printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
+			}
+			else
+				usage();
+		}
+		else if(!strcmp(argv[0], "maskrom-dump-arm32"))
+		{
+			argc -= 1;
+			argv += 1;
+			if(argc >= 2)
+			{
+				if(ctx.maskrom)
+				{
+					int rc4 = 0;
+					uint32_t uart = 0x0;
+					uint32_t addr = 0x0;
+					uint32_t len = 0x0;
+					for(int i = 0, idx = 0; i < argc; i++)
+					{
+						if(!strcmp(argv[i], "--rc4") && (argc > i + 1))
+						{
+							if(!strcmp(argv[i + 1], "on"))
+								rc4 = 1;
+							else if(!strcmp(argv[i + 1], "off"))
+								rc4 = 0;
+							i++;
+						}
+						else if(!strcmp(argv[i], "--uart") && (argc > i + 1))
+						{
+							uart = strtoul(argv[i + 1], NULL, 0);
+							i++;
+						}
+						else if(*argv[i] == '-')
+						{
+							usage();
+						}
+						else if(*argv[i] != '-' && strcmp(argv[i], "-") != 0)
+						{
+							if(idx == 0)
+								addr = strtoul(argv[i], NULL, 0);
+							else if(idx == 1)
+								len = strtoul(argv[i], NULL, 0);
+							idx++;
+						}
+					}
+					rock_maskrom_dump_arm32(&ctx, uart, addr, len, rc4);
 				}
 				else
 					printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
