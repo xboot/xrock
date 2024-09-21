@@ -342,8 +342,9 @@ _memmove:
 	add		r1, r1, #1
 	b		.Lmemcpy_bl4
 
+	.align 2
 _maskrom:
-	.long 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
+	.word 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
 
 reset:
 	adr r0, _maskrom
@@ -381,9 +382,10 @@ reset:
 	msr cpsr, r1
 	bx lr
 
+	.align 2
 _prog_address:
-	.long 0x00000000
+	.word 0x00000000
 _prog_size:
-	.long 0x00000004
+	.word 0x00000004
 _prog_data:
-	.long 0xdeadbeef
+	.word 0xdeadbeef
