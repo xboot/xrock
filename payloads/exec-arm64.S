@@ -2,12 +2,11 @@
 _start:
 	isb
 	dsb sy
-	nop
 	b reset
 
-	.align 3
+	.align 2
 _exec_address:
-	.dword 0x1122334455667788
+	.word 0x11223344
 
 	.align 3
 _maskrom:
@@ -26,7 +25,7 @@ reset:
 
 	mov x0, xzr
 	mov x1, xzr
-	ldr x2, _exec_address
+	ldr w2, _exec_address
 	br x2
 
 	mov x1, xzr

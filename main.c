@@ -715,7 +715,7 @@ int main(int argc, char * argv[])
 				{
 					int rc4 = 0;
 					char * filename = NULL;
-					uint64_t addr = 0x0;
+					uint32_t addr = 0x0;
 					for(int i = 0, idx = 0; i < argc; i++)
 					{
 						if(!strcmp(argv[i], "--rc4") && (argc > i + 1))
@@ -733,7 +733,7 @@ int main(int argc, char * argv[])
 						else if(*argv[i] != '-' && strcmp(argv[i], "-") != 0)
 						{
 							if(idx == 0)
-								addr = strtoull(argv[i], NULL, 0);
+								addr = strtoul(argv[i], NULL, 0);
 							else if(idx == 1)
 								filename = argv[i];
 							idx++;
@@ -799,7 +799,7 @@ int main(int argc, char * argv[])
 				if(ctx.maskrom)
 				{
 					int rc4 = 0;
-					uint64_t addr = 0x0;
+					uint32_t addr = 0x0;
 					for(int i = 0; i < argc; i++)
 					{
 						if(!strcmp(argv[i], "--rc4") && (argc > i + 1))
@@ -816,7 +816,7 @@ int main(int argc, char * argv[])
 						}
 						else if(*argv[i] != '-' && strcmp(argv[i], "-") != 0)
 						{
-							addr = strtoull(argv[i], NULL, 0);
+							addr = strtoul(argv[i], NULL, 0);
 						}
 					}
 					rock_maskrom_exec_arm64(&ctx, addr, rc4);

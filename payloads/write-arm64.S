@@ -2,7 +2,6 @@
 _start:
 	isb
 	dsb sy
-	nop
 	b reset
 
 _memmove:
@@ -87,12 +86,12 @@ reset:
 	str w1, [x0, #0xc]
 
 	adr x0, _prog_data
-	ldr x1, _prog_address
+	ldr w1, _prog_address
 	cmp x0, x1
 	beq 1f
-	ldr x0, _prog_address
+	ldr w0, _prog_address
 	adr x1, _prog_data
-	ldr x2, _prog_size
+	ldr w2, _prog_size
 	bl _memmove
 1:	nop
 
@@ -109,10 +108,10 @@ reset:
 	mov x0, #0x0
 	ret
 
-	.align 3
+	.align 2
 _prog_address:
-	.dword 0x1122334455667788
+	.word 0x11223344
 _prog_size:
-	.dword 0x1234567890abcdef
+	.word 0x55667788
 _prog_data:
-	.dword 0xdeadbeefdeadbeef
+	.word 0xdeadbeef
