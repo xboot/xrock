@@ -71,6 +71,7 @@ struct flash_info_t {
 int xrock_init(struct xrock_ctx_t * ctx);
 void rock_maskrom_upload_memory(struct xrock_ctx_t * ctx, uint32_t code, void * buf, uint64_t len, int rc4);
 void rock_maskrom_upload_file(struct xrock_ctx_t * ctx, uint32_t code, const char * filename, int rc4);
+void rock_maskrom_dump_arm64(struct xrock_ctx_t * ctx, uint32_t uart, uint32_t addr, uint32_t len, int rc4);
 void rock_maskrom_write_arm32_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len, int rc4);
 void rock_maskrom_write_arm64_progress(struct xrock_ctx_t * ctx, uint32_t addr, void * buf, size_t len, int rc4);
 void rock_maskrom_exec_arm32(struct xrock_ctx_t * ctx, uint32_t addr, int rc4);
