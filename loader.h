@@ -6,6 +6,8 @@ extern "C" {
 #endif
 
 #include <x.h>
+#include <rc4.h>
+#include <crc16.h>
 #include <crc32.h>
 #include <misc.h>
 
@@ -63,6 +65,8 @@ struct rkloader_ctx_t {
 	struct rkloader_header_t * header;
 	struct rkloader_entry_t * entry[32];
 	int nentry;
+	void * idbbuf;
+	uint64_t idblen;
 };
 
 char * loader_wide2str(char * str, uint8_t * wide, int len);
