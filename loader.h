@@ -57,6 +57,9 @@ struct rkloader_entry_t {
 struct rkloader_ctx_t {
 	void * buffer;
 	uint64_t length;
+	int is_newidb;
+	int is_rc4on;
+	int is_sign;
 	struct rkloader_header_t * header;
 	struct rkloader_entry_t * entry[32];
 	int nentry;

@@ -110,35 +110,35 @@ int main(int argc, char * argv[])
 		{
 			if(ctx.maskrom)
 			{
-				struct rkloader_ctx_t * bctx = rkloader_ctx_alloc(argv[0]);
-				if(bctx)
+				struct rkloader_ctx_t * lctx = rkloader_ctx_alloc(argv[0]);
+				if(lctx)
 				{
-					for(int i = 0; i < bctx->nentry; i++)
+					for(int i = 0; i < lctx->nentry; i++)
 					{
-						struct rkloader_entry_t * e = bctx->entry[i];
+						struct rkloader_entry_t * e = lctx->entry[i];
 						char str[256];
 						if(e->type == RKLOADER_ENTRY_471)
 						{
-							void * buf = (char *)bctx->buffer + get_unaligned_le32(&e->data_offset);
+							void * buf = (char *)lctx->buffer + get_unaligned_le32(&e->data_offset);
 							uint64_t len = get_unaligned_le32(&e->data_size);
 							uint32_t delay = get_unaligned_le32(&e->data_delay);
 
 							printf("Downloading '%s'\r\n", loader_wide2str(str, (uint8_t *)&e->name[0], sizeof(e->name)));
-							rock_maskrom_upload_memory(&ctx, 0x471, buf, len, bctx->header->rc4_flag ? 0 : 1);
+							rock_maskrom_upload_memory(&ctx, 0x471, buf, len, lctx->is_rc4on);
 							usleep(delay * 1000);
 						}
 						else if(e->type == RKLOADER_ENTRY_472)
 						{
-							void * buf = (char *)bctx->buffer + get_unaligned_le32(&e->data_offset);
+							void * buf = (char *)lctx->buffer + get_unaligned_le32(&e->data_offset);
 							uint64_t len = get_unaligned_le32(&e->data_size);
 							uint32_t delay = get_unaligned_le32(&e->data_delay);
 
 							printf("Downloading '%s'\r\n", loader_wide2str(str, (uint8_t *)&e->name[0], sizeof(e->name)));
-							rock_maskrom_upload_memory(&ctx, 0x472, buf, len, bctx->header->rc4_flag ? 0 : 1);
+							rock_maskrom_upload_memory(&ctx, 0x472, buf, len, lctx->is_rc4on);
 							usleep(delay * 1000);
 						}
 					}
-					rkloader_ctx_free(bctx);
+					rkloader_ctx_free(lctx);
 				}
 				else
 					printf("ERROR: Not a valid loader '%s'\r\n", argv[0]);

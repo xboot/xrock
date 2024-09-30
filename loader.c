@@ -39,6 +39,21 @@ struct rkloader_ctx_t * rkloader_ctx_alloc(const char * filename)
 		return NULL;
 	}
 
+	if(le32_to_cpu(ctx->header->tag) == 0x2052444c)
+		ctx->is_newidb = 1;
+	else
+		ctx->is_newidb = 0;
+
+	if(ctx->header->rc4_flag)
+		ctx->is_rc4on = 0;
+	else
+		ctx->is_rc4on = 1;
+
+	if(ctx->header->sign_flag == 'S')
+		ctx->is_sign = 1;
+	else
+		ctx->is_sign = 0;
+
 	ctx->nentry = ctx->header->code471_num + ctx->header->code472_num + ctx->header->loader_num;
 	if(ctx->nentry <= 0)
 	{
