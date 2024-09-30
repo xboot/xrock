@@ -57,6 +57,7 @@ For 32-bits windows, you can using `i686-w64-mingw32-` instead of `x86_64-w64-mi
 usage:
     xrock maskrom <ddr> <usbplug> [--rc4-off]    - Initial chip using ddr and usbplug in maskrom mode
     xrock download <loader>                      - Initial chip using loader in maskrom mode
+    xrock upgrade <loader>                       - Upgrade loader to flash in loader mode
     xrock ready                                  - Show chip ready or not
     xrock version                                - Show chip version
     xrock capability                             - Show capability information
