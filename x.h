@@ -246,32 +246,32 @@ static inline void __put_unaligned_be64(uint8_t * p, uint64_t val)
 
 static inline void put_unaligned_le16(void * p, uint16_t val)
 {
-	__put_unaligned_le16(p, val);
+	__put_unaligned_le16((uint8_t *)p, val);
 }
 
 static inline void put_unaligned_be16(void * p, uint16_t val)
 {
-	__put_unaligned_be16(p, val);
+	__put_unaligned_be16((uint8_t *)p, val);
 }
 
 static inline void put_unaligned_le32(void * p, uint32_t val)
 {
-	__put_unaligned_le32(p, val);
+	__put_unaligned_le32((uint8_t *)p, val);
 }
 
 static inline void put_unaligned_be32(void * p, uint32_t val)
 {
-	__put_unaligned_be32(p, val);
+	__put_unaligned_be32((uint8_t *)p, val);
 }
 
 static inline void put_unaligned_le64(void * p, uint64_t val)
 {
-	__put_unaligned_le64(p, val);
+	__put_unaligned_le64((uint8_t *)p, val);
 }
 
 static inline void put_unaligned_be64(void * p, uint64_t val)
 {
-	__put_unaligned_be64(p, val);
+	__put_unaligned_be64((uint8_t *)p, val);
 }
 
 /*
