@@ -14,7 +14,7 @@ static const char * manufacturer[] = {
 
 static void usage(void)
 {
-	printf("xrock(v1.1.2) - https://github.com/xboot/xrock\r\n");
+	printf("xrock(v1.1.3) - https://github.com/xboot/xrock\r\n");
 	printf("    Copyright(c) Jianjun Jiang <8192542@qq.com>\r\n");
 	printf("    Mobile phone: +86-18665388956\r\n");
 	printf("    QQ: 8192542\r\n");
@@ -22,6 +22,7 @@ static void usage(void)
 	printf("usage:\r\n");
 	printf("    xrock maskrom <ddr> <usbplug> [--rc4-off]    - Initial chip using ddr and usbplug in maskrom mode\r\n");
 	printf("    xrock download <loader>                      - Initial chip using loader in maskrom mode\r\n");
+	printf("    xrock upgrade <loader>                       - Upgrade loader to flash in loader mode\r\n");
 	printf("    xrock ready                                  - Show chip ready or not\r\n");
 	printf("    xrock version                                - Show chip version\r\n");
 	printf("    xrock capability                             - Show capability information\r\n");
@@ -145,6 +146,68 @@ int main(int argc, char * argv[])
 			}
 			else
 				printf("ERROR: The chip '%s' does not in maskrom mode\r\n", ctx.chip->name);
+		}
+		else
+			usage();
+	}
+	else if(!strcmp(argv[1], "upgrade"))
+	{
+		argc -= 2;
+		argv += 2;
+		if(argc == 1)
+		{
+			struct rkloader_ctx_t * lctx = rkloader_ctx_alloc(argv[0]);
+			if(lctx)
+			{
+				uint32_t sec = 64;
+				enum storage_type_t type = rock_storage_read(&ctx);
+				switch(type)
+				{
+				case STORAGE_TYPE_FLASH:
+					sec = 64;
+					break;
+				case STORAGE_TYPE_EMMC:
+					sec = 64;
+					break;
+				case STORAGE_TYPE_SD:
+					sec = 64;
+					break;
+				case STORAGE_TYPE_SD1:
+					sec = 64;
+					break;
+				case STORAGE_TYPE_SPINOR:
+					sec = 128;
+					break;
+				case STORAGE_TYPE_SPINAND:
+					sec = 512;
+					break;
+				case STORAGE_TYPE_RAM:
+					sec = 64;
+					break;
+				case STORAGE_TYPE_USB:
+					sec = 64;
+					break;
+				case STORAGE_TYPE_SATA:
+					sec = 64;
+					break;
+				case STORAGE_TYPE_PCIE:
+					sec = 64;
+					break;
+				default:
+					break;
+				}
+				struct flash_info_t info;
+				if(rock_flash_detect(&ctx, &info))
+				{
+					if(!rock_flash_write_lba_progress(&ctx, sec, lctx->idblen / 512, lctx->idbbuf))
+						printf("Failed to write flash\r\n");
+				}
+				else
+					printf("Failed to detect flash\r\n");
+				rkloader_ctx_free(lctx);
+			}
+			else
+				printf("ERROR: Not a valid loader '%s'\r\n", argv[0]);
 		}
 		else
 			usage();
