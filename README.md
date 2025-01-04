@@ -352,6 +352,7 @@ xrock version
 xrock maskrom rk3576_ddr_lp4_2112MHz_lp5_2736MHz_v1.05.bin rk3576_usbplug_v1.02.bin --rc4-off
 xrock version
 ```
+
 ```shell
 xrock extra maskrom --rc4 off --sram rk3576_ddr_lp4_2112MHz_lp5_2736MHz_v1.05.bin --delay 10 --rc4 off --dram rk3576_usbplug_v1.02.bin --delay 10
 xrock version
@@ -367,6 +368,30 @@ xrock extra maskrom --rc4 off --sram rk3576_ddr_lp4_2112MHz_lp5_2736MHz_v1.05.bi
 
 ```shell
 xrock extra maskrom-dump-arm64 --rc4 off --uart 0x2ad40000 0x3ff81000 1024
+```
+
+### RK3506
+
+```shell
+xrock maskrom rk3506b_ddr_750MHz_v1.04.bin rk3506_usbplug_v1.02.bin --rc4-off
+xrock version
+```
+
+```shell
+xrock extra maskrom --rc4 off --sram rk3506b_ddr_750MHz_v1.04.bin --delay 10 --rc4 off --dram rk3506_usbplug_v1.02.bin --delay 10
+xrock version
+```
+
+- Initial ddr memory
+
+```shell
+xrock extra maskrom --rc4 off --sram rk3506b_ddr_750MHz_v1.04.bin --delay 10
+```
+
+- Dump memory region in hex format by debug uart
+
+```shell
+xrock extra maskrom-dump-arm32 --rc4 off --uart 0xff0a0000 0xff910000 1024
 ```
 
 ## Links

@@ -24,6 +24,7 @@ static struct chip_t chips[] = {
 	{ 0x350b, "RK3588" },
 	{ 0x350d, "RK3562" },
 	{ 0x350e, "RK3576" },
+	{ 0x350f, "RK3506" },
 };
 
 static struct chip_t chip_unknown = {
