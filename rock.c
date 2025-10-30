@@ -1428,7 +1428,7 @@ int rock_flash_read_lba_to_file_progress(struct xrock_ctx_t * ctx, uint32_t sec,
 {
 	int MAXSEC = 16384;
 
-	FILE * f = fopen(filename, "w");
+	FILE * f = fopen(filename, "wb");
 	if(!f)
 		return 0;
 
@@ -1479,7 +1479,7 @@ int rock_flash_write_lba_from_file_progress(struct xrock_ctx_t * ctx, uint32_t s
 {
 	int MAXSEC = 16384;
 
-	FILE * f = fopen(filename, "r");
+	FILE * f = fopen(filename, "rb");
 	if(!f)
 		return 0;
 
