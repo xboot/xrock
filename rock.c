@@ -1430,7 +1430,10 @@ int rock_flash_read_lba_to_file_progress(struct xrock_ctx_t * ctx, uint32_t sec,
 
 	FILE * f = fopen(filename, "wb");
 	if(!f)
-		return 0;
+	{
+		perror("Failed to open file for writing");
+		exit(-1);
+	}
 
 	if(cnt <= 65536)
 		MAXSEC = 128;
@@ -1481,7 +1484,10 @@ int rock_flash_write_lba_from_file_progress(struct xrock_ctx_t * ctx, uint32_t s
 
 	FILE * f = fopen(filename, "rb");
 	if(!f)
-		return 0;
+	{
+		perror("Failed to read file");
+		exit(-1);
+	}
 
 	fseek(f, 0, SEEK_END);
 	int64_t len = ftell(f);
