@@ -1,6 +1,6 @@
 module.exports = {
   title: 'XROCK 文档',
-  url: 'https://xrock.xstar.org',
+  url: 'https://xrock.xboot.org',
   baseUrl: '/',
   onBrokenLinks: 'warn',
   markdown: {

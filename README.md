@@ -3,7 +3,7 @@
 # XROCK
 The low level tools for rockchip SOC with maskrom and loader mode support.
 
-[Documentation](https://xrock.xstar.org) &mdash; [Releases](https://github.com/xboot/xrock/releases/)
+[Documentation](https://xrock.xboot.org) &mdash; [Releases](https://github.com/xboot/xrock/releases/)
 
 ## How to build
 
